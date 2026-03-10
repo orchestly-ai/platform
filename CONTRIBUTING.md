@@ -6,21 +6,21 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.9+
 - Node.js 18+
 - Git
 
 ### Backend
 
 ```bash
-cd backend
-python -m venv venv
+# From project root
+python3 -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
+pip install -r backend/requirements.txt
 
 # Run the server
-uvicorn backend.api.main:app --reload
+USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true \
+  python -m uvicorn backend.api.main:app --reload
 ```
 
 ### Frontend
@@ -34,8 +34,8 @@ npm run dev
 ### Running Tests
 
 ```bash
-# Backend tests
-python -m pytest backend/tests/ -v
+# Backend tests (from project root, with venv activated)
+USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true python -m pytest backend/tests/ -v
 
 # Frontend tests
 cd dashboard && npm test

@@ -1,8 +1,7 @@
 # Orchestly
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/orchestly/orchestly)](https://github.com/orchestly/orchestly)
-[![Discord](https://img.shields.io/discord/placeholder?label=Discord&logo=discord)](https://discord.gg/orchestly)
+[![GitHub Stars](https://img.shields.io/github/stars/orchestly-ai/platform)](https://github.com/orchestly-ai/platform)
 
 **Open-source orchestration platform for AI agents.**
 
@@ -30,12 +29,10 @@ Orchestly lets you register, route, monitor, and govern AI agents across your or
 git clone https://github.com/orchestly-ai/platform.git orchestly
 cd orchestly
 
-# Install backend
-cd backend
+# Set up Python virtual environment
 python3 -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cd ..
+pip install -r backend/requirements.txt
 
 # Start the API (uses SQLite — no Postgres required)
 ADMIN_PASSWORD=admin123 USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true \
@@ -49,7 +46,7 @@ Login: `admin@example.com` / `admin123`
 To run the **dashboard** (separate terminal):
 
 ```bash
-cd orchestly/dashboard
+cd dashboard
 npm install
 npm run dev
 ```
@@ -98,7 +95,7 @@ orchestly/
 └── docker-compose.yml
 ```
 
-- **Backend**: Python 3.11+, FastAPI, SQLAlchemy 2.0 (async), aiosqlite (dev) / asyncpg (prod)
+- **Backend**: Python 3.9+, FastAPI, SQLAlchemy 2.0 (async), aiosqlite (dev) / asyncpg (prod)
 - **Frontend**: React 18, TypeScript, Vite, TailwindCSS
 - **Auth**: JWT with RBAC, optional SSO/SAML
 
@@ -116,7 +113,7 @@ ANTHROPIC_API_KEY=
 GROQ_API_KEY=
 
 # Auth
-JWT_SECRET=change-me-in-production
+JWT_SECRET_KEY=           # Generate with: python3 -c "import secrets; print(secrets.token_urlsafe(48))"
 ADMIN_PASSWORD=
 ```
 
@@ -125,8 +122,8 @@ See [`.env.example`](.env.example) for all available configuration options.
 ## Development
 
 ```bash
-# Backend (from project root, with venv activated)
-cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && cd ..
+# Backend (from project root)
+python3 -m venv venv && source venv/bin/activate && pip install -r backend/requirements.txt
 USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true python -m uvicorn backend.api.main:app --reload
 
 # Frontend (separate terminal)
