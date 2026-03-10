@@ -1,0 +1,2 @@
+# This directory stores webhook handlers and events data
+# Data files are gitignored to prevent committing runtime data

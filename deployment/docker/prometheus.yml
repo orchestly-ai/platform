@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'agent-orchestrator-dev'
+    environment: 'development'
+
+scrape_configs:
+  # Agent Orchestrator API
+  - job_name: 'agent-orchestrator-api'
+    static_configs:
+      - targets: ['api:9090']
+        labels:
+          service: 'api'
+          component: 'backend'
+
+  # PostgreSQL (if exporter is configured)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:9187']
+        labels:
+          service: 'postgres'
+          component: 'database'
+
+  # Redis (if exporter is configured)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:9121']
+        labels:
+          service: 'redis'
+          component: 'cache'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          component: 'monitoring'

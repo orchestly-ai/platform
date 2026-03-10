@@ -1,0 +1,315 @@
+# HubSpot Integration
+# CRM and marketing automation platform
+
+id: hubspot
+name: hubspot
+display_name: HubSpot
+description: CRM, marketing automation, sales, and customer service platform
+category: crm
+icon_url: https://www.hubspot.com/favicon.ico
+version: "1.0.0"
+documentation_url: https://developers.hubspot.com/docs/api/overview
+
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: Private App Access Token
+      type: password
+      required: true
+      help: |
+        To get your access token:
+        1. Go to Settings > Integrations > Private Apps
+        2. Click "Create a private app"
+        3. Give it a name and select required scopes
+        4. Copy the generated access token
+
+actions:
+  # Contact Actions
+  list_contacts:
+    name: List Contacts
+    description: Get all contacts with optional filtering
+    type: http
+    http:
+      method: GET
+      url: "https://api.hubapi.com/crm/v3/objects/contacts"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "{{parameters.limit}}"
+        after: "{{parameters.after}}"
+        properties: "{{parameters.properties}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+        description: Maximum number of contacts to return (max 100)
+      - name: after
+        label: After Cursor
+        type: string
+        required: false
+        description: Pagination cursor for next page
+      - name: properties
+        label: Properties
+        type: string
+        required: false
+        default: "email,firstname,lastname,phone,company"
+        description: Comma-separated list of properties to return
+
+  get_contact:
+    name: Get Contact
+    description: Get a specific contact by ID
+    type: http
+    http:
+      method: GET
+      url: "https://api.hubapi.com/crm/v3/objects/contacts/{{parameters.contact_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        properties: "{{parameters.properties}}"
+    parameters:
+      - name: contact_id
+        label: Contact ID
+        type: string
+        required: true
+      - name: properties
+        label: Properties
+        type: string
+        required: false
+        default: "email,firstname,lastname,phone,company"
+
+  create_contact:
+    name: Create Contact
+    description: Create a new contact
+    type: http
+    http:
+      method: POST
+      url: "https://api.hubapi.com/crm/v3/objects/contacts"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        properties:
+          email: "{{parameters.email}}"
+          firstname: "{{parameters.firstname}}"
+          lastname: "{{parameters.lastname}}"
+          phone: "{{parameters.phone}}"
+          company: "{{parameters.company}}"
+    parameters:
+      - name: email
+        label: Email
+        type: string
+        required: true
+      - name: firstname
+        label: First Name
+        type: string
+        required: false
+      - name: lastname
+        label: Last Name
+        type: string
+        required: false
+      - name: phone
+        label: Phone
+        type: string
+        required: false
+      - name: company
+        label: Company
+        type: string
+        required: false
+
+  update_contact:
+    name: Update Contact
+    description: Update an existing contact
+    type: http
+    http:
+      method: PATCH
+      url: "https://api.hubapi.com/crm/v3/objects/contacts/{{parameters.contact_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        properties:
+          email: "{{parameters.email}}"
+          firstname: "{{parameters.firstname}}"
+          lastname: "{{parameters.lastname}}"
+    parameters:
+      - name: contact_id
+        label: Contact ID
+        type: string
+        required: true
+      - name: email
+        label: Email
+        type: string
+        required: false
+      - name: firstname
+        label: First Name
+        type: string
+        required: false
+      - name: lastname
+        label: Last Name
+        type: string
+        required: false
+
+  # Company Actions
+  list_companies:
+    name: List Companies
+    description: Get all companies
+    type: http
+    http:
+      method: GET
+      url: "https://api.hubapi.com/crm/v3/objects/companies"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "{{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  create_company:
+    name: Create Company
+    description: Create a new company
+    type: http
+    http:
+      method: POST
+      url: "https://api.hubapi.com/crm/v3/objects/companies"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        properties:
+          name: "{{parameters.name}}"
+          domain: "{{parameters.domain}}"
+          industry: "{{parameters.industry}}"
+    parameters:
+      - name: name
+        label: Company Name
+        type: string
+        required: true
+      - name: domain
+        label: Domain
+        type: string
+        required: false
+      - name: industry
+        label: Industry
+        type: string
+        required: false
+
+  # Deal Actions
+  list_deals:
+    name: List Deals
+    description: Get all deals in the pipeline
+    type: http
+    http:
+      method: GET
+      url: "https://api.hubapi.com/crm/v3/objects/deals"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "{{parameters.limit}}"
+        properties: "{{parameters.properties}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+      - name: properties
+        label: Properties
+        type: string
+        required: false
+        default: "dealname,amount,dealstage,closedate"
+
+  create_deal:
+    name: Create Deal
+    description: Create a new deal
+    type: http
+    http:
+      method: POST
+      url: "https://api.hubapi.com/crm/v3/objects/deals"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        properties:
+          dealname: "{{parameters.dealname}}"
+          amount: "{{parameters.amount}}"
+          dealstage: "{{parameters.dealstage}}"
+          pipeline: "{{parameters.pipeline}}"
+    parameters:
+      - name: dealname
+        label: Deal Name
+        type: string
+        required: true
+      - name: amount
+        label: Amount
+        type: number
+        required: false
+      - name: dealstage
+        label: Deal Stage
+        type: string
+        required: false
+        default: "appointmentscheduled"
+      - name: pipeline
+        label: Pipeline
+        type: string
+        required: false
+        default: "default"
+
+  # Search
+  search_contacts:
+    name: Search Contacts
+    description: Search for contacts using filters
+    type: http
+    http:
+      method: POST
+      url: "https://api.hubapi.com/crm/v3/objects/contacts/search"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        filterGroups:
+          - filters:
+              - propertyName: "{{parameters.property}}"
+                operator: "{{parameters.operator}}"
+                value: "{{parameters.value}}"
+        limit: "{{parameters.limit}}"
+    parameters:
+      - name: property
+        label: Property Name
+        type: string
+        required: true
+        default: email
+      - name: operator
+        label: Operator
+        type: string
+        required: true
+        default: EQ
+        enum: [EQ, NEQ, LT, LTE, GT, GTE, CONTAINS_TOKEN, NOT_CONTAINS_TOKEN]
+      - name: value
+        label: Value
+        type: string
+        required: true
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  test_connection:
+    name: Test Connection
+    description: Verify HubSpot API credentials
+    type: http
+    http:
+      method: GET
+      url: "https://api.hubapi.com/crm/v3/objects/contacts"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "1"
+    parameters: []

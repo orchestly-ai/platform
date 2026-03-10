@@ -1,0 +1,125 @@
+# Groq Integration
+# Ultra-fast LLM inference with Llama, Mixtral, and more
+
+id: groq
+name: Groq
+display_name: Groq
+description: Ultra-fast LLM inference with Llama and Mixtral models
+long_description: |
+  Groq provides the fastest LLM inference available. Access Llama 3,
+  Mixtral, and other open models with extremely low latency.
+  Great for real-time applications and high-throughput workloads.
+
+category: ai
+tags:
+  - llm
+  - ai
+  - llama
+  - mixtral
+  - fast-inference
+
+icon_url: /icons/groq.svg
+color: "#F55036"
+
+# Authentication
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: API Key
+      type: password
+      required: true
+      help: |
+        Get your free API key from Groq:
+        1. Go to https://console.groq.com/keys
+        2. Click "Create API Key"
+        3. Copy and paste the key here
+
+# Actions
+actions:
+  chat_completion:
+    name: chat_completion
+    display_name: Chat Completion
+    description: Generate a chat response using Groq's fast inference
+    type: http
+
+    method: POST
+    url: "https://api.groq.com/openai/v1/chat/completions"
+    headers:
+      Authorization: "Bearer {{auth.api_key}}"
+      Content-Type: "application/json"
+    body:
+      model: "{{parameters.model}}"
+      messages:
+        - role: "user"
+          content: "{{parameters.prompt}}"
+      temperature: "{{parameters.temperature}}"
+      max_tokens: "{{parameters.max_tokens}}"
+
+    parameters:
+      - name: prompt
+        label: Prompt
+        type: string
+        required: true
+        description: The prompt or question to send to the model
+        supports_templates: true
+      - name: model
+        label: Model
+        type: string
+        required: false
+        default: "llama-3.3-70b-versatile"
+        enum:
+          - llama-3.3-70b-versatile
+          - llama-3.1-8b-instant
+          - llama3-70b-8192
+          - llama3-8b-8192
+          - mixtral-8x7b-32768
+        description: |
+          Available models:
+          - llama-3.3-70b-versatile: Best quality, recommended
+          - llama-3.1-8b-instant: Fastest responses
+          - mixtral-8x7b-32768: Good for complex reasoning
+      - name: temperature
+        label: Temperature
+        type: number
+        required: false
+        default: 0.7
+        description: Creativity level (0-2, higher = more creative)
+      - name: max_tokens
+        label: Max Tokens
+        type: integer
+        required: false
+        default: 1000
+        description: Maximum length of the response
+
+    response:
+      mappings:
+        text: "$.choices[0].message.content"
+        model: "$.model"
+        prompt_tokens: "$.usage.prompt_tokens"
+        completion_tokens: "$.usage.completion_tokens"
+        total_tokens: "$.usage.total_tokens"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify API key is valid
+    type: http
+
+    method: GET
+    url: "https://api.groq.com/openai/v1/models"
+    headers:
+      Authorization: "Bearer {{auth.api_key}}"
+
+    parameters: []
+
+    response:
+      mappings:
+        models: "$.data"
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://console.groq.com/docs
+homepage_url: https://groq.com
+is_enabled: true
+supports_test_connection: true

@@ -1,0 +1,144 @@
+{
+  "dashboard": {
+    "title": "Agent Orchestrator - System Overview",
+    "tags": ["agent-orchestrator", "production"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Registered Agents",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "agents_registered_total",
+            "legendFormat": "Total Agents"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Active Agents",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "agents_active_total",
+            "legendFormat": "Active"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Agents in Error State",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "agents_error_total",
+            "legendFormat": "Errors"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Total Queue Depth",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(queue_depth)",
+            "legendFormat": "Queued Tasks"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Task Completion Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(tasks_completed_total[5m])",
+            "legendFormat": "Completed - {{capability}}"
+          },
+          {
+            "expr": "rate(tasks_failed_total[5m])",
+            "legendFormat": "Failed - {{capability}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Task Duration (p50, p95, p99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(task_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(task_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(task_duration_seconds_bucket[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 7,
+        "title": "Queue Depth by Capability",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "queue_depth",
+            "legendFormat": "{{capability}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "LLM Cost (USD)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(llm_cost_total[1h])) * 3600",
+            "legendFormat": "Hourly Cost"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 9,
+        "title": "HTTP Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}} {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 10,
+        "title": "HTTP Request Duration (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      }
+    ]
+  }
+}

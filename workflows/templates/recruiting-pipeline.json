@@ -1,0 +1,128 @@
+{
+  "name": "HR Recruiting Pipeline",
+  "description": "End-to-end recruiting automation from resume screening to interview scheduling",
+  "tags": ["hr-tech", "recruiting", "automation", "screening"],
+  "isTemplate": true,
+  "nodes": [
+    {
+      "id": "supervisor-1",
+      "type": "supervisor",
+      "position": { "x": 300, "y": 50 },
+      "data": {
+        "label": "Recruiting Orchestrator",
+        "type": "supervisor",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["coordination", "candidate-pipeline", "hiring-manager-communication"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-1",
+      "type": "worker",
+      "position": { "x": 150, "y": 180 },
+      "data": {
+        "label": "Resume Parser",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["resume-parsing", "skill-extraction", "experience-analysis"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-2",
+      "type": "worker",
+      "position": { "x": 300, "y": 180 },
+      "data": {
+        "label": "Candidate Screener",
+        "type": "worker",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["job-matching", "scoring", "ranking"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-3",
+      "type": "worker",
+      "position": { "x": 450, "y": 180 },
+      "data": {
+        "label": "Interview Scheduler",
+        "type": "worker",
+        "llmModel": "gpt-3.5-turbo",
+        "capabilities": ["scheduling", "calendar-management", "email-generation"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-1",
+      "type": "tool",
+      "position": { "x": 200, "y": 310 },
+      "data": {
+        "label": "ATS Integration",
+        "type": "tool",
+        "tools": ["greenhouse_api", "lever_api", "linkedin_api"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-2",
+      "type": "tool",
+      "position": { "x": 400, "y": 310 },
+      "data": {
+        "label": "Communication Tools",
+        "type": "tool",
+        "tools": ["google_calendar", "calendly_api", "email_api"],
+        "status": "idle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supervisor-1",
+      "target": "worker-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "New Application"
+    },
+    {
+      "id": "e2",
+      "source": "worker-1",
+      "target": "worker-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Parsed Resume"
+    },
+    {
+      "id": "e3",
+      "source": "worker-2",
+      "target": "tool-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scored Candidate"
+    },
+    {
+      "id": "e4",
+      "source": "tool-1",
+      "target": "worker-3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Top Candidates"
+    },
+    {
+      "id": "e5",
+      "source": "worker-3",
+      "target": "tool-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Schedule Interview"
+    },
+    {
+      "id": "e6",
+      "source": "tool-2",
+      "target": "supervisor-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Confirmed"
+    }
+  ]
+}

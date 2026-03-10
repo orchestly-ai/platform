@@ -1,0 +1,109 @@
+{
+  "name": "Customer Support Automation",
+  "description": "Automatically triage, classify, and respond to customer support tickets with AI agents",
+  "tags": ["customer-support", "automation", "triage"],
+  "isTemplate": true,
+  "nodes": [
+    {
+      "id": "supervisor-1",
+      "type": "supervisor",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Support Coordinator",
+        "type": "supervisor",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["coordination", "routing", "escalation"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-1",
+      "type": "worker",
+      "position": { "x": 100, "y": 200 },
+      "data": {
+        "label": "Ticket Triage Agent",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["classification", "sentiment-analysis", "priority-scoring"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-2",
+      "type": "worker",
+      "position": { "x": 250, "y": 200 },
+      "data": {
+        "label": "Response Generator",
+        "type": "worker",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["response-generation", "knowledge-retrieval"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-3",
+      "type": "worker",
+      "position": { "x": 400, "y": 200 },
+      "data": {
+        "label": "Quality Checker",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["quality-assurance", "tone-analysis"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-1",
+      "type": "tool",
+      "position": { "x": 250, "y": 350 },
+      "data": {
+        "label": "Ticket System API",
+        "type": "tool",
+        "tools": ["zendesk_api", "send_email"],
+        "status": "idle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supervisor-1",
+      "target": "worker-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "New Ticket"
+    },
+    {
+      "id": "e2",
+      "source": "worker-1",
+      "target": "worker-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triaged"
+    },
+    {
+      "id": "e3",
+      "source": "worker-2",
+      "target": "worker-3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Draft Response"
+    },
+    {
+      "id": "e4",
+      "source": "worker-3",
+      "target": "tool-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Approved"
+    },
+    {
+      "id": "e5",
+      "source": "tool-1",
+      "target": "supervisor-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Complete"
+    }
+  ]
+}

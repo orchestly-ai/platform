@@ -1,0 +1,128 @@
+{
+  "name": "Expense Processing Pipeline",
+  "description": "Automated expense report processing with OCR, categorization, policy validation, and approval routing",
+  "tags": ["fintech", "expense-management", "ocr", "automation"],
+  "isTemplate": true,
+  "nodes": [
+    {
+      "id": "supervisor-1",
+      "type": "supervisor",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Expense Workflow Manager",
+        "type": "supervisor",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["coordination", "policy-enforcement", "approval-routing"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-1",
+      "type": "tool",
+      "position": { "x": 100, "y": 180 },
+      "data": {
+        "label": "Receipt OCR",
+        "type": "tool",
+        "tools": ["gpt4_vision", "tesseract_ocr"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-1",
+      "type": "worker",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Expense Categorizer",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["categorization", "merchant-recognition"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-2",
+      "type": "worker",
+      "position": { "x": 400, "y": 180 },
+      "data": {
+        "label": "Policy Validator",
+        "type": "worker",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["policy-validation", "fraud-detection"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-3",
+      "type": "worker",
+      "position": { "x": 250, "y": 310 },
+      "data": {
+        "label": "Approval Router",
+        "type": "worker",
+        "llmModel": "gpt-3.5-turbo",
+        "capabilities": ["routing", "notification"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-2",
+      "type": "tool",
+      "position": { "x": 250, "y": 440 },
+      "data": {
+        "label": "Accounting System",
+        "type": "tool",
+        "tools": ["quickbooks_api", "google_sheets", "email_notification"],
+        "status": "idle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supervisor-1",
+      "target": "tool-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Receipt Image"
+    },
+    {
+      "id": "e2",
+      "source": "tool-1",
+      "target": "worker-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Extracted Text"
+    },
+    {
+      "id": "e3",
+      "source": "worker-1",
+      "target": "worker-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Categorized"
+    },
+    {
+      "id": "e4",
+      "source": "worker-2",
+      "target": "worker-3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Validated"
+    },
+    {
+      "id": "e5",
+      "source": "worker-3",
+      "target": "tool-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Approved"
+    },
+    {
+      "id": "e6",
+      "source": "tool-2",
+      "target": "supervisor-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Recorded"
+    }
+  ]
+}

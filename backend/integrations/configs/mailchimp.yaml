@@ -1,0 +1,227 @@
+# Mailchimp Integration
+# API Key authentication
+
+id: mailchimp
+name: mailchimp
+display_name: Mailchimp
+description: Email marketing and automation platform
+category: email
+icon_url: https://mailchimp.com/favicon.ico
+version: "1.0.0"
+
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: API Key
+      type: password
+      required: true
+      help: |
+        Get your API key:
+        1. Go to Account > Extras > API keys
+        2. Create a new API key
+        3. Copy the full key (includes datacenter, e.g., xxx-us21)
+    - name: server
+      label: Server Prefix
+      type: string
+      required: true
+      placeholder: "us21"
+      help: |
+        The datacenter prefix from your API key.
+        If your API key is "abc123-us21", the server prefix is "us21"
+
+actions:
+  list_audiences:
+    name: List Audiences
+    description: Get all audiences (lists)
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/lists"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        count: "{{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: number
+        required: false
+        default: 10
+
+  get_audience:
+    name: Get Audience
+    description: Get details of a specific audience
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/lists/{{parameters.list_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters:
+      - name: list_id
+        label: Audience/List ID
+        type: string
+        required: true
+
+  list_members:
+    name: List Members
+    description: Get members of an audience
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/lists/{{parameters.list_id}}/members"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        count: "{{parameters.limit}}"
+        status: "{{parameters.status}}"
+    parameters:
+      - name: list_id
+        label: Audience/List ID
+        type: string
+        required: true
+      - name: limit
+        label: Limit
+        type: number
+        required: false
+        default: 10
+      - name: status
+        label: Status Filter
+        type: string
+        required: false
+        enum:
+          - "subscribed"
+          - "unsubscribed"
+          - "cleaned"
+          - "pending"
+
+  add_member:
+    name: Add Member
+    description: Add a new subscriber to an audience
+    type: http
+    http:
+      method: POST
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/lists/{{parameters.list_id}}/members"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: "application/json"
+      body:
+        email_address: "{{parameters.email}}"
+        status: "{{parameters.status}}"
+        merge_fields:
+          FNAME: "{{parameters.first_name}}"
+          LNAME: "{{parameters.last_name}}"
+    parameters:
+      - name: list_id
+        label: Audience/List ID
+        type: string
+        required: true
+      - name: email
+        label: Email Address
+        type: string
+        required: true
+      - name: status
+        label: Status
+        type: string
+        required: true
+        default: "subscribed"
+        enum:
+          - "subscribed"
+          - "pending"
+      - name: first_name
+        label: First Name
+        type: string
+        required: false
+      - name: last_name
+        label: Last Name
+        type: string
+        required: false
+
+  list_campaigns:
+    name: List Campaigns
+    description: Get all campaigns
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/campaigns"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        count: "{{parameters.limit}}"
+        status: "{{parameters.status}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: number
+        required: false
+        default: 10
+      - name: status
+        label: Status Filter
+        type: string
+        required: false
+        enum:
+          - "save"
+          - "paused"
+          - "schedule"
+          - "sending"
+          - "sent"
+
+  get_campaign:
+    name: Get Campaign
+    description: Get details of a specific campaign
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/campaigns/{{parameters.campaign_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters:
+      - name: campaign_id
+        label: Campaign ID
+        type: string
+        required: true
+
+  get_campaign_report:
+    name: Get Campaign Report
+    description: Get performance report for a campaign
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/reports/{{parameters.campaign_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters:
+      - name: campaign_id
+        label: Campaign ID
+        type: string
+        required: true
+
+  search_members:
+    name: Search Members
+    description: Search for members by email or name
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/search-members"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        query: "{{parameters.query}}"
+    parameters:
+      - name: query
+        label: Search Query
+        type: string
+        required: true
+        placeholder: "john@example.com"
+
+  test_connection:
+    name: Test Connection
+    description: Verify Mailchimp API access
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.server}}.api.mailchimp.com/3.0/ping"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters: []

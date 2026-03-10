@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orchestly"
+version = "0.1.0"
+description = "Python SDK for Orchestly — open-source AI agent orchestration platform"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [
+    { name = "Orchestly", email = "sdk@orchestly.ai" },
+]
+keywords = ["ai", "agents", "orchestration", "llm", "workflow"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "httpx>=0.26.0",
+    "pydantic>=2.5.0",
+    "typer>=0.9.0",
+    "uvicorn[standard]>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.1.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://orchestly.ai"
+Repository = "https://github.com/orchestly-ai/orchestly"
+Documentation = "https://github.com/orchestly-ai/orchestly#readme"
+Issues = "https://github.com/orchestly-ai/orchestly/issues"
+
+[project.scripts]
+orchestly = "orchestly.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["orchestly*"]

@@ -1,0 +1,34 @@
+# GitHub OAuth2 Configuration
+# Supports: Repos, Issues, PRs, Actions
+
+id: github
+name: github
+display_name: GitHub
+description: Connect to GitHub repositories, issues, and pull requests
+icon_url: https://github.com/favicon.ico
+
+oauth:
+  # OAuth endpoints
+  authorization_url: https://github.com/login/oauth/authorize
+  token_url: https://github.com/login/oauth/access_token
+  revoke_url: null  # GitHub doesn't have revoke endpoint, use settings
+  userinfo_url: https://api.github.com/user
+
+  # Credentials from environment
+  client_id_env: GITHUB_CLIENT_ID
+  client_secret_env: GITHUB_CLIENT_SECRET
+
+  # Default scopes
+  default_scopes:
+    - read:user
+    - user:email
+    - repo
+    - read:org
+
+  # Token settings
+  # Note: GitHub tokens don't expire unless configured
+  token_expiry_buffer_seconds: 0
+
+  # GitHub-specific: Accept header for API
+  extra_headers:
+    Accept: application/json

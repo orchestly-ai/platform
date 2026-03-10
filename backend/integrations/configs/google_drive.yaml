@@ -1,0 +1,103 @@
+# Google Drive Integration
+# OAuth2 authentication with Google
+
+id: google_drive
+name: google_drive
+display_name: Google Drive
+description: Store, sync, and share files with Google Drive
+category: storage
+icon_url: https://www.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png
+version: "1.0.0"
+
+auth:
+  type: oauth2
+  oauth:
+    provider: google
+    scopes:
+      - https://www.googleapis.com/auth/drive.file
+      - https://www.googleapis.com/auth/drive.readonly
+  fields:
+    - name: access_token
+      label: Access Token (Alternative)
+      type: password
+      required: false
+      help: |
+        If not using OAuth, you can provide an access token directly.
+        Get it from Google Cloud Console -> APIs & Services -> Credentials.
+
+actions:
+  list_files:
+    name: List Files
+    description: List files in Google Drive
+    type: http
+    http:
+      method: GET
+      url: "https://www.googleapis.com/drive/v3/files"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        pageSize: "{{parameters.page_size}}"
+        q: "{{parameters.query}}"
+    parameters:
+      - name: page_size
+        label: Page Size
+        type: number
+        required: false
+        default: 10
+      - name: query
+        label: Search Query
+        type: string
+        required: false
+    response_mapping:
+      files: "$.files"
+      next_page_token: "$.nextPageToken"
+
+  get_file:
+    name: Get File
+    description: Get file metadata
+    type: http
+    http:
+      method: GET
+      url: "https://www.googleapis.com/drive/v3/files/{{parameters.file_id}}"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+    parameters:
+      - name: file_id
+        label: File ID
+        type: string
+        required: true
+
+  upload_file:
+    name: Upload File
+    description: Upload a file to Google Drive
+    type: http
+    http:
+      method: POST
+      url: "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+        Content-Type: "application/json"
+      body:
+        name: "{{parameters.file_name}}"
+        mimeType: "{{parameters.mime_type}}"
+    parameters:
+      - name: file_name
+        label: File Name
+        type: string
+        required: true
+      - name: mime_type
+        label: MIME Type
+        type: string
+        required: false
+        default: "application/octet-stream"
+
+  test_connection:
+    name: Test Connection
+    description: Verify Google Drive credentials
+    type: http
+    http:
+      method: GET
+      url: "https://www.googleapis.com/drive/v3/about?fields=user"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+    parameters: []

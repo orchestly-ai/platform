@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-orchestrator-config
+  labels:
+    app: agent-orchestrator
+data:
+  # Database
+  postgres_host: "postgres"
+  postgres_port: "5432"
+  postgres_db: "agent_orchestrator"
+
+  # Redis
+  redis_host: "redis"
+  redis_port: "6379"
+  redis_db: "0"
+
+  # API
+  api_host: "0.0.0.0"
+  api_port: "8000"
+  api_workers: "4"
+
+  # Environment
+  environment: "production"
+  debug: "false"
+  log_level: "INFO"
+
+  # Features
+  enable_metrics: "true"
+  enable_tracing: "false"
+  enable_visual_workflow_designer: "false"
+
+  # Rate Limiting
+  rate_limit_enabled: "true"
+  rate_limit_requests_per_minute: "100"
+  rate_limit_requests_per_hour: "5000"
+
+  # Cost Limits
+  default_agent_daily_cost_limit: "100.0"
+  default_agent_monthly_cost_limit: "3000.0"
+  system_daily_cost_limit: "10000.0"
+  system_monthly_cost_limit: "300000.0"
+
+  # Task Configuration
+  default_task_timeout_seconds: "300"
+  max_task_timeout_seconds: "3600"
+  default_max_retries: "3"
+  max_concurrent_tasks_per_agent: "5"
+
+  # Queue
+  queue_ttl_seconds: "86400"
+
+  # CORS
+  cors_origins: '["http://localhost:3000","http://localhost:3001","https://dashboard.agent-orchestrator.example.com"]'

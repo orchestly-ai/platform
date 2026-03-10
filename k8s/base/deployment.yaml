@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-orchestrator-api
+  labels:
+    app: agent-orchestrator
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agent-orchestrator
+      component: api
+  template:
+    metadata:
+      labels:
+        app: agent-orchestrator
+        component: api
+    spec:
+      containers:
+      - name: api
+        image: agent-orchestrator/api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DEBUG
+          value: "false"
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: agent-orchestrator-config
+              key: postgres_host
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: agent-orchestrator-config
+              key: postgres_port
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: agent-orchestrator-config
+              key: postgres_db
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: agent-orchestrator-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: agent-orchestrator-secrets
+              key: postgres_password
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: agent-orchestrator-config
+              key: redis_host
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: agent-orchestrator-config
+              key: redis_port
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agent-orchestrator-secrets
+              key: jwt_secret_key
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agent-orchestrator-secrets
+              key: openai_api_key
+              optional: true
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agent-orchestrator-secrets
+              key: anthropic_api_key
+              optional: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: agent-orchestrator-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-orchestrator-dashboard
+  labels:
+    app: agent-orchestrator
+    component: dashboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agent-orchestrator
+      component: dashboard
+  template:
+    metadata:
+      labels:
+        app: agent-orchestrator
+        component: dashboard
+    spec:
+      containers:
+      - name: dashboard
+        image: agent-orchestrator/dashboard:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://agent-orchestrator-api:8000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5

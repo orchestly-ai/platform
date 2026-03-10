@@ -1,0 +1,152 @@
+# Jira Integration
+# API Token authentication
+
+id: jira
+name: jira
+display_name: Jira
+description: Project tracking and issue management with Atlassian Jira
+category: project_management
+icon_url: https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/favicon.png
+version: "1.0.0"
+
+auth:
+  type: api_key
+  fields:
+    - name: domain
+      label: Jira Domain
+      type: string
+      required: true
+      placeholder: "your-company.atlassian.net"
+      help: |
+        Your Jira Cloud domain (e.g., your-company.atlassian.net)
+    - name: email
+      label: Email
+      type: string
+      required: true
+      help: Your Atlassian account email
+    - name: api_token
+      label: API Token
+      type: password
+      required: true
+      help: |
+        Get your API token from:
+        1. Go to https://id.atlassian.com/manage-profile/security/api-tokens
+        2. Click "Create API token"
+        3. Copy the token
+
+actions:
+  list_projects:
+    name: List Projects
+    description: Get all projects in Jira
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.domain}}/rest/api/3/project"
+      headers:
+        Authorization: "Basic {{auth.email}}:{{auth.api_token}}"
+        Content-Type: "application/json"
+    parameters: []
+
+  get_issue:
+    name: Get Issue
+    description: Get details of a specific issue
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.domain}}/rest/api/3/issue/{{parameters.issue_key}}"
+      headers:
+        Authorization: "Basic {{auth.email}}:{{auth.api_token}}"
+        Content-Type: "application/json"
+    parameters:
+      - name: issue_key
+        label: Issue Key
+        type: string
+        required: true
+        placeholder: "PROJ-123"
+
+  create_issue:
+    name: Create Issue
+    description: Create a new issue in Jira
+    type: http
+    http:
+      method: POST
+      url: "https://{{auth.domain}}/rest/api/3/issue"
+      headers:
+        Authorization: "Basic {{auth.email}}:{{auth.api_token}}"
+        Content-Type: "application/json"
+      body:
+        fields:
+          project:
+            key: "{{parameters.project_key}}"
+          summary: "{{parameters.summary}}"
+          description:
+            type: doc
+            version: 1
+            content:
+              - type: paragraph
+                content:
+                  - type: text
+                    text: "{{parameters.description}}"
+          issuetype:
+            name: "{{parameters.issue_type}}"
+    parameters:
+      - name: project_key
+        label: Project Key
+        type: string
+        required: true
+        placeholder: "PROJ"
+      - name: summary
+        label: Summary
+        type: string
+        required: true
+      - name: description
+        label: Description
+        type: string
+        required: false
+      - name: issue_type
+        label: Issue Type
+        type: string
+        required: true
+        default: "Task"
+        enum:
+          - Task
+          - Bug
+          - Story
+          - Epic
+
+  search_issues:
+    name: Search Issues
+    description: Search for issues using JQL
+    type: http
+    http:
+      method: POST
+      url: "https://{{auth.domain}}/rest/api/3/search"
+      headers:
+        Authorization: "Basic {{auth.email}}:{{auth.api_token}}"
+        Content-Type: "application/json"
+      body:
+        jql: "{{parameters.jql}}"
+        maxResults: "{{parameters.max_results}}"
+    parameters:
+      - name: jql
+        label: JQL Query
+        type: string
+        required: true
+        placeholder: "project = PROJ AND status = Open"
+      - name: max_results
+        label: Max Results
+        type: number
+        required: false
+        default: 50
+
+  test_connection:
+    name: Test Connection
+    description: Verify Jira credentials
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.domain}}/rest/api/3/myself"
+      headers:
+        Authorization: "Basic {{auth.email}}:{{auth.api_token}}"
+        Content-Type: "application/json"
+    parameters: []

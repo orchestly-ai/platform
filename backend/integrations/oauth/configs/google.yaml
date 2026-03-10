@@ -1,0 +1,36 @@
+# Google OAuth2 Configuration
+# Supports: Drive, Sheets, Calendar, Gmail
+
+id: google
+name: google
+display_name: Google Workspace
+description: Connect to Google Drive, Sheets, Calendar, and more
+icon_url: https://www.google.com/favicon.ico
+
+oauth:
+  # OAuth endpoints
+  authorization_url: https://accounts.google.com/o/oauth2/v2/auth
+  token_url: https://oauth2.googleapis.com/token
+  revoke_url: https://oauth2.googleapis.com/revoke
+  userinfo_url: https://www.googleapis.com/oauth2/v2/userinfo
+
+  # Credentials from environment
+  client_id_env: GOOGLE_CLIENT_ID
+  client_secret_env: GOOGLE_CLIENT_SECRET
+
+  # Default scopes (can be customized per connection)
+  default_scopes:
+    - openid
+    - email
+    - profile
+    - https://www.googleapis.com/auth/drive.readonly
+    - https://www.googleapis.com/auth/spreadsheets
+    - https://www.googleapis.com/auth/calendar.readonly
+
+  # Additional OAuth parameters
+  extra_params:
+    access_type: offline        # Get refresh token
+    prompt: consent             # Always show consent screen
+
+  # Token settings
+  token_expiry_buffer_seconds: 300  # Refresh 5 min before expiry

@@ -1,0 +1,151 @@
+# Stripe Integration
+# API Key authentication
+
+id: stripe
+name: stripe
+display_name: Stripe
+description: Payment processing and billing with Stripe
+category: crm
+icon_url: https://stripe.com/favicon.ico
+version: "1.0.0"
+
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: Secret Key
+      type: password
+      required: true
+      help: |
+        Get your API key from:
+        1. Go to https://dashboard.stripe.com/apikeys
+        2. Copy the "Secret key" (starts with sk_)
+
+        Use sk_test_... for testing, sk_live_... for production.
+
+actions:
+  list_customers:
+    name: List Customers
+    description: Get all customers
+    type: http
+    http:
+      method: GET
+      url: "https://api.stripe.com/v1/customers"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "{{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: number
+        required: false
+        default: 10
+
+  get_customer:
+    name: Get Customer
+    description: Get a specific customer
+    type: http
+    http:
+      method: GET
+      url: "https://api.stripe.com/v1/customers/{{parameters.customer_id}}"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters:
+      - name: customer_id
+        label: Customer ID
+        type: string
+        required: true
+        placeholder: "cus_..."
+
+  create_customer:
+    name: Create Customer
+    description: Create a new customer
+    type: http
+    http:
+      method: POST
+      url: "https://api.stripe.com/v1/customers"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: "application/x-www-form-urlencoded"
+      body:
+        email: "{{parameters.email}}"
+        name: "{{parameters.name}}"
+        description: "{{parameters.description}}"
+    parameters:
+      - name: email
+        label: Email
+        type: string
+        required: true
+      - name: name
+        label: Name
+        type: string
+        required: false
+      - name: description
+        label: Description
+        type: string
+        required: false
+
+  list_invoices:
+    name: List Invoices
+    description: Get all invoices
+    type: http
+    http:
+      method: GET
+      url: "https://api.stripe.com/v1/invoices"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+      query_params:
+        limit: "{{parameters.limit}}"
+        customer: "{{parameters.customer_id}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: number
+        required: false
+        default: 10
+      - name: customer_id
+        label: Customer ID (optional)
+        type: string
+        required: false
+
+  create_payment_intent:
+    name: Create Payment Intent
+    description: Create a payment intent for charging a customer
+    type: http
+    http:
+      method: POST
+      url: "https://api.stripe.com/v1/payment_intents"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+        Content-Type: "application/x-www-form-urlencoded"
+      body:
+        amount: "{{parameters.amount}}"
+        currency: "{{parameters.currency}}"
+        customer: "{{parameters.customer_id}}"
+    parameters:
+      - name: amount
+        label: Amount (cents)
+        type: number
+        required: true
+        help: Amount in smallest currency unit (e.g., cents for USD)
+      - name: currency
+        label: Currency
+        type: string
+        required: true
+        default: "usd"
+      - name: customer_id
+        label: Customer ID
+        type: string
+        required: false
+
+  test_connection:
+    name: Test Connection
+    description: Verify Stripe API key
+    type: http
+    http:
+      method: GET
+      url: "https://api.stripe.com/v1/balance"
+      headers:
+        Authorization: "Bearer {{auth.api_key}}"
+    parameters: []

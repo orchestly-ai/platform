@@ -1,0 +1,316 @@
+# Zendesk Integration
+# Customer service and support platform
+
+id: zendesk
+name: zendesk
+display_name: Zendesk
+description: Customer service and support ticketing platform
+category: crm
+icon_url: https://www.zendesk.com/favicon.ico
+version: "1.0.0"
+documentation_url: https://developer.zendesk.com/api-reference
+
+auth:
+  type: api_key
+  fields:
+    - name: subdomain
+      label: Subdomain
+      type: string
+      required: true
+      placeholder: "yourcompany"
+      help: Your Zendesk subdomain (e.g., 'yourcompany' from yourcompany.zendesk.com)
+    - name: email
+      label: Email
+      type: string
+      required: true
+      help: Your Zendesk account email
+    - name: api_token
+      label: API Token
+      type: password
+      required: true
+      help: |
+        Generate API token:
+        1. Admin Center > Apps and Integrations > APIs > Zendesk API
+        2. Click "Add API token"
+        3. Copy the generated token
+
+actions:
+  # Ticket Actions
+  list_tickets:
+    name: List Tickets
+    description: Get all tickets
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/tickets.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+      query_params:
+        page: "{{parameters.page}}"
+        per_page: "{{parameters.per_page}}"
+        sort_by: "{{parameters.sort_by}}"
+    parameters:
+      - name: page
+        label: Page
+        type: integer
+        required: false
+        default: 1
+      - name: per_page
+        label: Per Page
+        type: integer
+        required: false
+        default: 25
+      - name: sort_by
+        label: Sort By
+        type: string
+        required: false
+        default: "created_at"
+        enum: [created_at, updated_at, priority, status]
+
+  get_ticket:
+    name: Get Ticket
+    description: Get a specific ticket by ID
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/tickets/{{parameters.ticket_id}}.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+    parameters:
+      - name: ticket_id
+        label: Ticket ID
+        type: integer
+        required: true
+
+  create_ticket:
+    name: Create Ticket
+    description: Create a new support ticket
+    type: http
+    http:
+      method: POST
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/tickets.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+        Content-Type: application/json
+      body:
+        ticket:
+          subject: "{{parameters.subject}}"
+          description: "{{parameters.description}}"
+          priority: "{{parameters.priority}}"
+          type: "{{parameters.type}}"
+          requester:
+            email: "{{parameters.requester_email}}"
+    parameters:
+      - name: subject
+        label: Subject
+        type: string
+        required: true
+      - name: description
+        label: Description
+        type: string
+        required: true
+      - name: priority
+        label: Priority
+        type: string
+        required: false
+        default: normal
+        enum: [low, normal, high, urgent]
+      - name: type
+        label: Type
+        type: string
+        required: false
+        enum: [problem, incident, question, task]
+      - name: requester_email
+        label: Requester Email
+        type: string
+        required: false
+
+  update_ticket:
+    name: Update Ticket
+    description: Update an existing ticket
+    type: http
+    http:
+      method: PUT
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/tickets/{{parameters.ticket_id}}.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+        Content-Type: application/json
+      body:
+        ticket:
+          status: "{{parameters.status}}"
+          priority: "{{parameters.priority}}"
+          comment:
+            body: "{{parameters.comment}}"
+            public: "{{parameters.public}}"
+    parameters:
+      - name: ticket_id
+        label: Ticket ID
+        type: integer
+        required: true
+      - name: status
+        label: Status
+        type: string
+        required: false
+        enum: [new, open, pending, hold, solved, closed]
+      - name: priority
+        label: Priority
+        type: string
+        required: false
+        enum: [low, normal, high, urgent]
+      - name: comment
+        label: Comment
+        type: string
+        required: false
+      - name: public
+        label: Public Comment
+        type: boolean
+        required: false
+        default: true
+
+  add_comment:
+    name: Add Comment
+    description: Add a comment to a ticket
+    type: http
+    http:
+      method: PUT
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/tickets/{{parameters.ticket_id}}.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+        Content-Type: application/json
+      body:
+        ticket:
+          comment:
+            body: "{{parameters.comment}}"
+            public: "{{parameters.public}}"
+    parameters:
+      - name: ticket_id
+        label: Ticket ID
+        type: integer
+        required: true
+      - name: comment
+        label: Comment
+        type: string
+        required: true
+      - name: public
+        label: Public
+        type: boolean
+        required: false
+        default: true
+
+  # User Actions
+  list_users:
+    name: List Users
+    description: Get all users
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/users.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+      query_params:
+        page: "{{parameters.page}}"
+        per_page: "{{parameters.per_page}}"
+    parameters:
+      - name: page
+        label: Page
+        type: integer
+        required: false
+        default: 1
+      - name: per_page
+        label: Per Page
+        type: integer
+        required: false
+        default: 25
+
+  search_users:
+    name: Search Users
+    description: Search for users
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/users/search.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+      query_params:
+        query: "{{parameters.query}}"
+    parameters:
+      - name: query
+        label: Search Query
+        type: string
+        required: true
+        placeholder: "email:user@example.com"
+
+  create_user:
+    name: Create User
+    description: Create a new user
+    type: http
+    http:
+      method: POST
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/users.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+        Content-Type: application/json
+      body:
+        user:
+          name: "{{parameters.name}}"
+          email: "{{parameters.email}}"
+          role: "{{parameters.role}}"
+    parameters:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: email
+        label: Email
+        type: string
+        required: true
+      - name: role
+        label: Role
+        type: string
+        required: false
+        default: end-user
+        enum: [end-user, agent, admin]
+
+  # Search
+  search_tickets:
+    name: Search Tickets
+    description: Search tickets using Zendesk query language
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/search.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+      query_params:
+        query: "{{parameters.query}}"
+        sort_by: "{{parameters.sort_by}}"
+        sort_order: "{{parameters.sort_order}}"
+    parameters:
+      - name: query
+        label: Search Query
+        type: string
+        required: true
+        placeholder: "type:ticket status:open"
+        description: Zendesk search query language
+      - name: sort_by
+        label: Sort By
+        type: string
+        required: false
+        default: created_at
+      - name: sort_order
+        label: Sort Order
+        type: string
+        required: false
+        default: desc
+        enum: [asc, desc]
+
+  test_connection:
+    name: Test Connection
+    description: Verify Zendesk credentials
+    type: http
+    http:
+      method: GET
+      url: "https://{{auth.subdomain}}.zendesk.com/api/v2/users/me.json"
+      headers:
+        Authorization: "Basic {{auth.email}}/token:{{auth.api_token}}"
+    parameters: []

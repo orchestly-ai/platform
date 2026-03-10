@@ -1,0 +1,7 @@
+# Customer Support Demo Requirements
+
+# Agent Orchestrator SDK
+-e ../../sdk/python
+
+# Additional dependencies
+python-dotenv==1.0.0

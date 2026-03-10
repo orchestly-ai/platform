@@ -1,0 +1,1007 @@
+/* =============================================================================
+   Orchestly Platform - Monokai Pro Theme
+
+   A comprehensive dark theme inspired by Monokai Pro for VS Code/Sublime Text.
+   Colors sourced from: https://monokai.pro/
+
+   Color Palette:
+   - Background Primary:   #2d2a2e (main content)
+   - Background Secondary: #221f22 (sidebars, headers)
+   - Background Tertiary:  #19181a (page background)
+   - Background Hover:     #403e41 (hover states)
+   - Background Active:    #5b595c (active states)
+
+   - Text Primary:    #fcfcfa (main text)
+   - Text Secondary:  #c1c0c0 (secondary text)
+   - Text Tertiary:   #939293 (muted text)
+
+   - Border Primary:   #403e41
+   - Border Secondary: #5b595c
+
+   - Accent Colors (Monokai Pro signature):
+     - Pink/Red:  #ff6188
+     - Green:     #a9dc76
+     - Yellow:    #ffd866
+     - Orange:    #fc9867
+     - Purple:    #ab9df2
+     - Cyan:      #78dce8
+   ============================================================================= */
+
+/* =============================================================================
+   CSS Custom Properties
+   ============================================================================= */
+
+:root {
+  /* Light theme defaults */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-hover: #f9fafb;
+  --bg-active: #e5e7eb;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-inverse: #ffffff;
+
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  /* Monokai Pro accent colors (used in both themes) */
+  --pink: #ff6188;
+  --green: #a9dc76;
+  --yellow: #ffd866;
+  --orange: #fc9867;
+  --purple: #ab9df2;
+  --cyan: #78dce8;
+  --red: #ff6188;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* =============================================================================
+   Monokai Pro Dark Theme Base
+   ============================================================================= */
+
+.theme-dark {
+  color-scheme: dark;
+}
+
+.theme-dark,
+.theme-dark body,
+.theme-dark #root {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* =============================================================================
+   Background Colors - Complete Gray/Slate Scale Override
+   ============================================================================= */
+
+/* White backgrounds */
+.theme-dark .bg-white,
+.theme-dark [class*="bg-white"]:not(.bg-white\/0):not([class*="bg-white/"]) {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Gray backgrounds - full scale */
+.theme-dark .bg-gray-50,
+.theme-dark .bg-slate-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark .bg-gray-100,
+.theme-dark .bg-slate-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .bg-gray-200,
+.theme-dark .bg-slate-200 {
+  background-color: var(--bg-hover) !important;
+}
+
+.theme-dark .bg-gray-300,
+.theme-dark .bg-slate-300 {
+  background-color: var(--bg-active) !important;
+}
+
+.theme-dark .bg-gray-400,
+.theme-dark .bg-slate-400 {
+  background-color: #727072 !important;
+}
+
+.theme-dark .bg-gray-500,
+.theme-dark .bg-slate-500 {
+  background-color: #939293 !important;
+}
+
+.theme-dark .bg-gray-600,
+.theme-dark .bg-slate-600 {
+  background-color: #c1c0c0 !important;
+}
+
+.theme-dark .bg-gray-700,
+.theme-dark .bg-slate-700 {
+  background-color: var(--bg-hover) !important;
+}
+
+.theme-dark .bg-gray-800,
+.theme-dark .bg-slate-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark .bg-gray-900,
+.theme-dark .bg-slate-900 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* =============================================================================
+   Text Colors - Complete Gray/Slate Scale Override
+   ============================================================================= */
+
+.theme-dark .text-gray-50,
+.theme-dark .text-slate-50 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-gray-100,
+.theme-dark .text-slate-100 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-gray-200,
+.theme-dark .text-slate-200 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-gray-300,
+.theme-dark .text-slate-300 {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .text-gray-400,
+.theme-dark .text-slate-400 {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark .text-gray-500,
+.theme-dark .text-slate-500 {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark .text-gray-600,
+.theme-dark .text-slate-600 {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .text-gray-700,
+.theme-dark .text-slate-700 {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .text-gray-800,
+.theme-dark .text-slate-800 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-gray-900,
+.theme-dark .text-slate-900 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-black {
+  color: var(--text-primary) !important;
+}
+
+/* =============================================================================
+   Border Colors - Complete Gray/Slate Scale Override
+   ============================================================================= */
+
+.theme-dark .border-gray-50,
+.theme-dark .border-slate-50 {
+  border-color: var(--border-secondary) !important;
+}
+
+.theme-dark .border-gray-100,
+.theme-dark .border-slate-100 {
+  border-color: var(--border-secondary) !important;
+}
+
+.theme-dark .border-gray-200,
+.theme-dark .border-slate-200 {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .border-gray-300,
+.theme-dark .border-slate-300 {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .border-gray-400,
+.theme-dark .border-slate-400 {
+  border-color: var(--border-secondary) !important;
+}
+
+.theme-dark .border-gray-500,
+.theme-dark .border-slate-500 {
+  border-color: var(--border-secondary) !important;
+}
+
+.theme-dark .border-gray-600,
+.theme-dark .border-slate-600 {
+  border-color: #727072 !important;
+}
+
+.theme-dark .border-gray-700,
+.theme-dark .border-slate-700 {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .border-gray-800,
+.theme-dark .border-slate-800 {
+  border-color: var(--border-secondary) !important;
+}
+
+/* Generic border class */
+.theme-dark .border {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .border-b,
+.theme-dark .border-t,
+.theme-dark .border-l,
+.theme-dark .border-r {
+  border-color: var(--border-primary) !important;
+}
+
+/* Divide utilities */
+.theme-dark .divide-gray-100 > * + *,
+.theme-dark .divide-gray-200 > * + *,
+.theme-dark .divide-gray-300 > * + * {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .divide-y > * + * {
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .divide-x > * + * {
+  border-color: var(--border-primary) !important;
+}
+
+/* =============================================================================
+   Monokai Pro Accent Colors - Status & Semantic Colors
+   ============================================================================= */
+
+/* Pink/Red - Errors, Warnings, Important */
+.theme-dark .bg-red-50 { background-color: rgba(255, 97, 136, 0.1) !important; }
+.theme-dark .bg-red-100 { background-color: rgba(255, 97, 136, 0.15) !important; }
+.theme-dark .bg-red-200 { background-color: rgba(255, 97, 136, 0.25) !important; }
+.theme-dark .bg-red-500,
+.theme-dark .bg-red-600,
+.theme-dark .bg-red-700 { background-color: var(--pink) !important; }
+
+.theme-dark .text-red-500,
+.theme-dark .text-red-600,
+.theme-dark .text-red-700,
+.theme-dark .text-red-800,
+.theme-dark .text-red-900 { color: var(--pink) !important; }
+
+.theme-dark .border-red-200 { border-color: rgba(255, 97, 136, 0.3) !important; }
+.theme-dark .border-red-300 { border-color: rgba(255, 97, 136, 0.4) !important; }
+.theme-dark .border-red-500 { border-color: var(--pink) !important; }
+
+/* Green - Success, Active, Healthy */
+.theme-dark .bg-green-50 { background-color: rgba(169, 220, 118, 0.1) !important; }
+.theme-dark .bg-green-100 { background-color: rgba(169, 220, 118, 0.15) !important; }
+.theme-dark .bg-green-200 { background-color: rgba(169, 220, 118, 0.25) !important; }
+.theme-dark .bg-green-500,
+.theme-dark .bg-green-600,
+.theme-dark .bg-green-700 { background-color: var(--green) !important; }
+
+.theme-dark .text-green-500,
+.theme-dark .text-green-600,
+.theme-dark .text-green-700,
+.theme-dark .text-green-800,
+.theme-dark .text-green-900 { color: var(--green) !important; }
+
+.theme-dark .border-green-200 { border-color: rgba(169, 220, 118, 0.3) !important; }
+.theme-dark .border-green-300 { border-color: rgba(169, 220, 118, 0.4) !important; }
+.theme-dark .border-green-500 { border-color: var(--green) !important; }
+
+/* Emerald - Alternative Green */
+.theme-dark .bg-emerald-50 { background-color: rgba(169, 220, 118, 0.1) !important; }
+.theme-dark .bg-emerald-100 { background-color: rgba(169, 220, 118, 0.15) !important; }
+.theme-dark .bg-emerald-500,
+.theme-dark .bg-emerald-600 { background-color: var(--green) !important; }
+.theme-dark .text-emerald-500,
+.theme-dark .text-emerald-600,
+.theme-dark .text-emerald-700 { color: var(--green) !important; }
+
+/* Yellow - Warnings, Pending */
+.theme-dark .bg-yellow-50 { background-color: rgba(255, 216, 102, 0.1) !important; }
+.theme-dark .bg-yellow-100 { background-color: rgba(255, 216, 102, 0.15) !important; }
+.theme-dark .bg-yellow-200 { background-color: rgba(255, 216, 102, 0.25) !important; }
+.theme-dark .bg-yellow-500,
+.theme-dark .bg-yellow-600 { background-color: var(--yellow) !important; }
+
+.theme-dark .text-yellow-500,
+.theme-dark .text-yellow-600,
+.theme-dark .text-yellow-700,
+.theme-dark .text-yellow-800,
+.theme-dark .text-yellow-900 { color: var(--yellow) !important; }
+
+.theme-dark .border-yellow-200 { border-color: rgba(255, 216, 102, 0.3) !important; }
+.theme-dark .border-yellow-300 { border-color: rgba(255, 216, 102, 0.4) !important; }
+
+/* Amber - Alternative Yellow */
+.theme-dark .bg-amber-50 { background-color: rgba(255, 216, 102, 0.1) !important; }
+.theme-dark .bg-amber-100 { background-color: rgba(255, 216, 102, 0.15) !important; }
+.theme-dark .bg-amber-500 { background-color: var(--yellow) !important; }
+.theme-dark .text-amber-500,
+.theme-dark .text-amber-600,
+.theme-dark .text-amber-700,
+.theme-dark .text-amber-900 { color: var(--yellow) !important; }
+.theme-dark .border-amber-300 { border-color: rgba(255, 216, 102, 0.4) !important; }
+
+/* Orange - Accent, Highlights */
+.theme-dark .bg-orange-50 { background-color: rgba(252, 152, 103, 0.1) !important; }
+.theme-dark .bg-orange-100 { background-color: rgba(252, 152, 103, 0.15) !important; }
+.theme-dark .bg-orange-200 { background-color: rgba(252, 152, 103, 0.25) !important; }
+.theme-dark .bg-orange-500,
+.theme-dark .bg-orange-600 { background-color: var(--orange) !important; }
+
+.theme-dark .text-orange-500,
+.theme-dark .text-orange-600,
+.theme-dark .text-orange-700,
+.theme-dark .text-orange-800,
+.theme-dark .text-orange-900 { color: var(--orange) !important; }
+
+.theme-dark .border-orange-200 { border-color: rgba(252, 152, 103, 0.3) !important; }
+.theme-dark .border-orange-300 { border-color: rgba(252, 152, 103, 0.4) !important; }
+
+/* Blue/Cyan - Info, Links */
+.theme-dark .bg-blue-50 { background-color: rgba(120, 220, 232, 0.1) !important; }
+.theme-dark .bg-blue-100 { background-color: rgba(120, 220, 232, 0.15) !important; }
+.theme-dark .bg-blue-200 { background-color: rgba(120, 220, 232, 0.25) !important; }
+.theme-dark .bg-blue-500,
+.theme-dark .bg-blue-600,
+.theme-dark .bg-blue-700 { background-color: var(--cyan) !important; }
+
+.theme-dark .text-blue-500,
+.theme-dark .text-blue-600,
+.theme-dark .text-blue-700,
+.theme-dark .text-blue-800,
+.theme-dark .text-blue-900 { color: var(--cyan) !important; }
+
+.theme-dark .border-blue-200 { border-color: rgba(120, 220, 232, 0.3) !important; }
+.theme-dark .border-blue-300 { border-color: rgba(120, 220, 232, 0.4) !important; }
+.theme-dark .border-blue-500 { border-color: var(--cyan) !important; }
+
+/* Cyan/Teal */
+.theme-dark .bg-cyan-50,
+.theme-dark .bg-teal-50 { background-color: rgba(120, 220, 232, 0.1) !important; }
+.theme-dark .bg-cyan-100,
+.theme-dark .bg-teal-100 { background-color: rgba(120, 220, 232, 0.15) !important; }
+.theme-dark .bg-cyan-500,
+.theme-dark .bg-teal-500 { background-color: var(--cyan) !important; }
+.theme-dark .text-cyan-500,
+.theme-dark .text-cyan-600,
+.theme-dark .text-cyan-700,
+.theme-dark .text-teal-500,
+.theme-dark .text-teal-600,
+.theme-dark .text-teal-700 { color: var(--cyan) !important; }
+
+/* Indigo - Primary Accent (mapped to Orange for Monokai) */
+.theme-dark .bg-indigo-50 { background-color: rgba(252, 152, 103, 0.1) !important; }
+.theme-dark .bg-indigo-100 { background-color: rgba(252, 152, 103, 0.15) !important; }
+.theme-dark .bg-indigo-200 { background-color: rgba(252, 152, 103, 0.25) !important; }
+.theme-dark .bg-indigo-500,
+.theme-dark .bg-indigo-600,
+.theme-dark .bg-indigo-700 { background-color: var(--orange) !important; }
+
+.theme-dark .text-indigo-500,
+.theme-dark .text-indigo-600,
+.theme-dark .text-indigo-700,
+.theme-dark .text-indigo-800,
+.theme-dark .text-indigo-900 { color: var(--orange) !important; }
+
+.theme-dark .border-indigo-200 { border-color: rgba(252, 152, 103, 0.3) !important; }
+.theme-dark .border-indigo-300 { border-color: rgba(252, 152, 103, 0.4) !important; }
+.theme-dark .border-indigo-500 { border-color: var(--orange) !important; }
+
+/* Purple/Violet */
+.theme-dark .bg-purple-50,
+.theme-dark .bg-violet-50 { background-color: rgba(171, 157, 242, 0.1) !important; }
+.theme-dark .bg-purple-100,
+.theme-dark .bg-violet-100 { background-color: rgba(171, 157, 242, 0.15) !important; }
+.theme-dark .bg-purple-200,
+.theme-dark .bg-violet-200 { background-color: rgba(171, 157, 242, 0.25) !important; }
+.theme-dark .bg-purple-500,
+.theme-dark .bg-purple-600,
+.theme-dark .bg-violet-500,
+.theme-dark .bg-violet-600 { background-color: var(--purple) !important; }
+
+.theme-dark .text-purple-500,
+.theme-dark .text-purple-600,
+.theme-dark .text-purple-700,
+.theme-dark .text-purple-800,
+.theme-dark .text-purple-900,
+.theme-dark .text-violet-500,
+.theme-dark .text-violet-600,
+.theme-dark .text-violet-700 { color: var(--purple) !important; }
+
+.theme-dark .border-purple-200 { border-color: rgba(171, 157, 242, 0.3) !important; }
+.theme-dark .border-purple-300 { border-color: rgba(171, 157, 242, 0.4) !important; }
+
+/* Pink (separate from red) */
+.theme-dark .bg-pink-50 { background-color: rgba(255, 97, 136, 0.1) !important; }
+.theme-dark .bg-pink-100 { background-color: rgba(255, 97, 136, 0.15) !important; }
+.theme-dark .bg-pink-500 { background-color: var(--pink) !important; }
+.theme-dark .text-pink-500,
+.theme-dark .text-pink-600,
+.theme-dark .text-pink-700 { color: var(--pink) !important; }
+
+/* =============================================================================
+   Hover States
+   ============================================================================= */
+
+.theme-dark .hover\:bg-gray-50:hover,
+.theme-dark .hover\:bg-gray-100:hover,
+.theme-dark .hover\:bg-slate-50:hover,
+.theme-dark .hover\:bg-slate-100:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+.theme-dark .hover\:bg-gray-200:hover,
+.theme-dark .hover\:bg-slate-200:hover {
+  background-color: var(--bg-active) !important;
+}
+
+.theme-dark .hover\:bg-red-50:hover { background-color: rgba(255, 97, 136, 0.1) !important; }
+.theme-dark .hover\:bg-red-100:hover { background-color: rgba(255, 97, 136, 0.2) !important; }
+.theme-dark .hover\:bg-red-200:hover { background-color: rgba(255, 97, 136, 0.3) !important; }
+
+.theme-dark .hover\:bg-green-50:hover { background-color: rgba(169, 220, 118, 0.1) !important; }
+.theme-dark .hover\:bg-green-100:hover { background-color: rgba(169, 220, 118, 0.2) !important; }
+.theme-dark .hover\:bg-green-200:hover { background-color: rgba(169, 220, 118, 0.3) !important; }
+.theme-dark .hover\:bg-green-700:hover { background-color: #8fc462 !important; }
+
+.theme-dark .hover\:bg-yellow-50:hover { background-color: rgba(255, 216, 102, 0.1) !important; }
+.theme-dark .hover\:bg-yellow-100:hover { background-color: rgba(255, 216, 102, 0.2) !important; }
+.theme-dark .hover\:bg-yellow-200:hover { background-color: rgba(255, 216, 102, 0.3) !important; }
+
+.theme-dark .hover\:bg-blue-50:hover { background-color: rgba(120, 220, 232, 0.1) !important; }
+.theme-dark .hover\:bg-blue-100:hover { background-color: rgba(120, 220, 232, 0.2) !important; }
+.theme-dark .hover\:bg-blue-200:hover { background-color: rgba(120, 220, 232, 0.3) !important; }
+.theme-dark .hover\:bg-blue-700:hover { background-color: #5bc4d4 !important; }
+
+.theme-dark .hover\:bg-indigo-50:hover { background-color: rgba(252, 152, 103, 0.1) !important; }
+.theme-dark .hover\:bg-indigo-100:hover { background-color: rgba(252, 152, 103, 0.2) !important; }
+.theme-dark .hover\:bg-indigo-200:hover { background-color: rgba(252, 152, 103, 0.3) !important; }
+.theme-dark .hover\:bg-indigo-700:hover { background-color: #e88855 !important; }
+
+.theme-dark .hover\:bg-purple-50:hover { background-color: rgba(171, 157, 242, 0.1) !important; }
+.theme-dark .hover\:bg-purple-100:hover { background-color: rgba(171, 157, 242, 0.2) !important; }
+.theme-dark .hover\:bg-purple-200:hover { background-color: rgba(171, 157, 242, 0.3) !important; }
+.theme-dark .hover\:bg-purple-700:hover { background-color: #9789e0 !important; }
+
+.theme-dark .hover\:bg-orange-50:hover { background-color: rgba(252, 152, 103, 0.1) !important; }
+.theme-dark .hover\:bg-orange-100:hover { background-color: rgba(252, 152, 103, 0.2) !important; }
+.theme-dark .hover\:bg-orange-200:hover { background-color: rgba(252, 152, 103, 0.3) !important; }
+.theme-dark .hover\:bg-orange-700:hover { background-color: #e88855 !important; }
+
+.theme-dark .hover\:bg-cyan-50:hover { background-color: rgba(120, 220, 232, 0.1) !important; }
+
+.theme-dark .hover\:bg-amber-100:hover { background-color: rgba(255, 216, 102, 0.2) !important; }
+.theme-dark .hover\:bg-amber-200:hover { background-color: rgba(255, 216, 102, 0.3) !important; }
+
+/* Text hover */
+.theme-dark .hover\:text-gray-900:hover,
+.theme-dark .hover\:text-gray-700:hover {
+  color: var(--text-primary) !important;
+}
+
+/* =============================================================================
+   Form Elements
+   ============================================================================= */
+
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--orange) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(252, 152, 103, 0.2) !important;
+}
+
+.theme-dark input:disabled,
+.theme-dark select:disabled,
+.theme-dark textarea:disabled {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-tertiary) !important;
+  opacity: 0.7;
+}
+
+/* Checkbox and Radio */
+.theme-dark input[type="checkbox"],
+.theme-dark input[type="radio"] {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+.theme-dark input[type="checkbox"]:checked,
+.theme-dark input[type="radio"]:checked {
+  background-color: var(--orange) !important;
+  border-color: var(--orange) !important;
+}
+
+/* =============================================================================
+   Buttons
+   ============================================================================= */
+
+/* Primary button (indigo -> orange) */
+.theme-dark .bg-indigo-600:hover,
+.theme-dark .hover\:bg-indigo-700:hover {
+  background-color: #e88855 !important;
+}
+
+.theme-dark .bg-blue-600:hover,
+.theme-dark .hover\:bg-blue-700:hover {
+  background-color: #5bc4d4 !important;
+}
+
+.theme-dark .bg-green-600:hover,
+.theme-dark .hover\:bg-green-700:hover {
+  background-color: #8fc462 !important;
+}
+
+.theme-dark .bg-red-600:hover,
+.theme-dark .hover\:bg-red-700:hover {
+  background-color: #e54d75 !important;
+}
+
+.theme-dark .bg-purple-600:hover,
+.theme-dark .hover\:bg-purple-700:hover {
+  background-color: #9789e0 !important;
+}
+
+.theme-dark .bg-orange-600:hover,
+.theme-dark .hover\:bg-orange-700:hover {
+  background-color: #e88855 !important;
+}
+
+/* Ghost/Secondary buttons */
+.theme-dark button.text-gray-700:hover,
+.theme-dark a.text-gray-700:hover {
+  color: var(--text-primary) !important;
+}
+
+/* =============================================================================
+   Focus Rings
+   ============================================================================= */
+
+.theme-dark .focus\:ring-indigo-500:focus,
+.theme-dark .focus\:ring-indigo-600:focus {
+  --tw-ring-color: var(--orange) !important;
+}
+
+.theme-dark .focus\:ring-blue-500:focus,
+.theme-dark .focus\:ring-blue-600:focus {
+  --tw-ring-color: var(--cyan) !important;
+}
+
+.theme-dark .focus\:ring-green-500:focus {
+  --tw-ring-color: var(--green) !important;
+}
+
+.theme-dark .focus\:ring-red-500:focus {
+  --tw-ring-color: var(--pink) !important;
+}
+
+.theme-dark .focus\:ring-purple-500:focus {
+  --tw-ring-color: var(--purple) !important;
+}
+
+.theme-dark .focus\:ring-gray-500:focus {
+  --tw-ring-color: var(--border-secondary) !important;
+}
+
+.theme-dark .focus\:border-indigo-500:focus,
+.theme-dark .focus\:border-indigo-300:focus {
+  border-color: var(--orange) !important;
+}
+
+.theme-dark .focus\:border-blue-500:focus {
+  border-color: var(--cyan) !important;
+}
+
+/* =============================================================================
+   Tables
+   ============================================================================= */
+
+.theme-dark table {
+  background-color: var(--bg-primary) !important;
+}
+
+.theme-dark thead {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark th {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-primary) !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark td {
+  color: var(--text-secondary) !important;
+  border-bottom-color: var(--border-primary) !important;
+}
+
+.theme-dark tbody tr {
+  border-bottom-color: var(--border-primary) !important;
+}
+
+.theme-dark tbody tr:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+.theme-dark tbody tr:nth-child(even) {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* =============================================================================
+   Cards & Panels
+   ============================================================================= */
+
+.theme-dark .rounded-lg:not(button):not(a):not(select):not(input):not(textarea),
+.theme-dark .rounded-xl:not(button):not(a):not(select):not(input):not(textarea),
+.theme-dark .rounded-2xl:not(button):not(a):not(select):not(input):not(textarea) {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* More specific card patterns */
+.theme-dark .bg-white.rounded-lg,
+.theme-dark .bg-white.rounded-xl {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Don't override colored rounded elements */
+.theme-dark [class*="bg-green"].rounded-lg,
+.theme-dark [class*="bg-red"].rounded-lg,
+.theme-dark [class*="bg-blue"].rounded-lg,
+.theme-dark [class*="bg-yellow"].rounded-lg,
+.theme-dark [class*="bg-orange"].rounded-lg,
+.theme-dark [class*="bg-purple"].rounded-lg,
+.theme-dark [class*="bg-indigo"].rounded-lg,
+.theme-dark [class*="bg-pink"].rounded-lg {
+  background-color: inherit !important;
+}
+
+/* Shadows in dark mode */
+.theme-dark .shadow,
+.theme-dark .shadow-sm,
+.theme-dark .shadow-md,
+.theme-dark .shadow-lg,
+.theme-dark .shadow-xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =============================================================================
+   Sidebar & Navigation
+   ============================================================================= */
+
+.theme-dark .sidebar {
+  background-color: var(--bg-secondary) !important;
+  border-right-color: var(--border-primary) !important;
+}
+
+.theme-dark .nav-item {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .nav-item:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .nav-item-active {
+  background-color: var(--orange) !important;
+  color: var(--text-inverse) !important;
+}
+
+.theme-dark .sidebar-header {
+  border-bottom-color: var(--border-primary) !important;
+}
+
+.theme-dark .sidebar-footer {
+  border-top-color: var(--border-primary) !important;
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* =============================================================================
+   Layout Components
+   ============================================================================= */
+
+.theme-dark .dashboard-layout {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .main-content {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .page-content {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .top-bar {
+  background-color: var(--bg-secondary) !important;
+  border-bottom-color: var(--border-primary) !important;
+}
+
+.theme-dark .container {
+  background-color: transparent !important;
+}
+
+/* min-h-screen with background */
+.theme-dark .min-h-screen {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* =============================================================================
+   Modals & Dropdowns
+   ============================================================================= */
+
+.theme-dark .fixed.inset-0 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.theme-dark [role="dialog"],
+.theme-dark [role="menu"],
+.theme-dark .dropdown-menu {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-primary) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* =============================================================================
+   ReactFlow / Workflow Builder
+   ============================================================================= */
+
+.theme-dark .react-flow {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .react-flow__background {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .react-flow__minimap {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark .react-flow__controls {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .react-flow__controls-button {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-primary) !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+}
+
+.theme-dark .react-flow__controls-button:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+.theme-dark .react-flow__controls-button svg {
+  fill: var(--text-primary) !important;
+}
+
+.theme-dark .react-flow__panel {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .react-flow__node {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .react-flow__edge-path {
+  stroke: var(--border-secondary) !important;
+}
+
+.theme-dark .react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--orange) !important;
+}
+
+/* Node palette sidebar */
+.theme-dark .bg-gray-50.border-r {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* =============================================================================
+   Scrollbars
+   ============================================================================= */
+
+.theme-dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.theme-dark ::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 5px;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+  background: #727072;
+}
+
+/* Firefox scrollbar */
+.theme-dark * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) var(--bg-tertiary);
+}
+
+/* =============================================================================
+   Badges & Status Indicators
+   ============================================================================= */
+
+/* Ring utilities for status indicators */
+.theme-dark .ring-green-500 { --tw-ring-color: var(--green) !important; }
+.theme-dark .ring-red-500 { --tw-ring-color: var(--pink) !important; }
+.theme-dark .ring-yellow-500 { --tw-ring-color: var(--yellow) !important; }
+.theme-dark .ring-blue-500 { --tw-ring-color: var(--cyan) !important; }
+
+/* Dot indicators */
+.theme-dark .bg-green-400,
+.theme-dark .bg-green-500 {
+  background-color: var(--green) !important;
+}
+
+.theme-dark .bg-red-400,
+.theme-dark .bg-red-500 {
+  background-color: var(--pink) !important;
+}
+
+.theme-dark .bg-yellow-400,
+.theme-dark .bg-yellow-500 {
+  background-color: var(--yellow) !important;
+}
+
+/* =============================================================================
+   Code & Monospace
+   ============================================================================= */
+
+.theme-dark code,
+.theme-dark pre {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.theme-dark .font-mono {
+  color: var(--cyan) !important;
+}
+
+/* =============================================================================
+   Links
+   ============================================================================= */
+
+.theme-dark a:not([class*="bg-"]):not([class*="text-white"]) {
+  color: var(--cyan);
+}
+
+.theme-dark a:not([class*="bg-"]):not([class*="text-white"]):hover {
+  color: #9ae8f0;
+}
+
+/* =============================================================================
+   Progress Bars
+   ============================================================================= */
+
+.theme-dark .bg-gray-200.rounded-full,
+.theme-dark .h-2.rounded-full.bg-gray-200 {
+  background-color: var(--bg-hover) !important;
+}
+
+/* =============================================================================
+   Utility Classes for Manual Theming
+   ============================================================================= */
+
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+.border-primary { border-color: var(--border-primary); }
+.border-secondary { border-color: var(--border-secondary); }
+
+/* Monokai Pro color utilities */
+.monokai-pink { color: var(--pink); }
+.monokai-green { color: var(--green); }
+.monokai-yellow { color: var(--yellow); }
+.monokai-orange { color: var(--orange); }
+.monokai-purple { color: var(--purple); }
+.monokai-cyan { color: var(--cyan); }
+.monokai-red { color: var(--red); }
+
+.bg-monokai-pink { background-color: var(--pink); }
+.bg-monokai-green { background-color: var(--green); }
+.bg-monokai-yellow { background-color: var(--yellow); }
+.bg-monokai-orange { background-color: var(--orange); }
+.bg-monokai-purple { background-color: var(--purple); }
+.bg-monokai-cyan { background-color: var(--cyan); }
+.bg-monokai-red { background-color: var(--red); }
+
+/* =============================================================================
+   Animations & Transitions
+   ============================================================================= */
+
+.theme-dark .animate-pulse {
+  animation: pulse-dark 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-dark {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* =============================================================================
+   Print Styles
+   ============================================================================= */
+
+@media print {
+  .theme-dark,
+  .theme-dark * {
+    background-color: white !important;
+    color: black !important;
+  }
+}

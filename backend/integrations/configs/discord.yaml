@@ -1,0 +1,168 @@
+# Discord Integration
+# Send messages, manage channels, and interact with Discord servers
+
+id: discord
+name: Discord
+display_name: Discord
+description: Send messages and notifications to Discord channels
+long_description: |
+  Connect your Discord server to send automated messages, notifications,
+  and alerts. Perfect for team communications, alerts, and bot interactions.
+
+category: communication
+tags:
+  - messaging
+  - chat
+  - notifications
+  - team
+
+icon_url: /icons/discord.svg
+color: "#5865F2"
+
+# Authentication
+auth:
+  type: bot_token
+  fields:
+    - name: bot_token
+      label: Bot Token
+      type: password
+      required: true
+      help: |
+        Get your bot token from the Discord Developer Portal:
+        1. Go to https://discord.com/developers/applications
+        2. Select your application (or create one)
+        3. Go to "Bot" section
+        4. Click "Reset Token" to get a new token
+
+# Actions
+actions:
+  send_message:
+    name: send_message
+    display_name: Send Message
+    description: Send a message to a Discord channel
+    type: http
+
+    method: POST
+    url: "https://discord.com/api/v10/channels/{{parameters.channel_id}}/messages"
+    headers:
+      Authorization: "Bot {{auth.bot_token}}"
+      Content-Type: "application/json"
+    body:
+      content: "{{parameters.content}}"
+
+    parameters:
+      - name: channel_id
+        label: Channel ID
+        type: string
+        required: true
+        description: The Discord channel ID to send the message to
+        help: Right-click channel → Copy ID (enable Developer Mode in settings)
+      - name: content
+        label: Message Content
+        type: string
+        required: true
+        description: The message text to send
+        supports_templates: true
+
+    response:
+      mappings:
+        message_id: "$.id"
+        channel_id: "$.channel_id"
+        content: "$.content"
+
+  send_embed:
+    name: send_embed
+    display_name: Send Embed Message
+    description: Send a rich embed message with formatting
+    type: http
+
+    method: POST
+    url: "https://discord.com/api/v10/channels/{{parameters.channel_id}}/messages"
+    headers:
+      Authorization: "Bot {{auth.bot_token}}"
+      Content-Type: "application/json"
+    body:
+      embeds:
+        - title: "{{parameters.title}}"
+          description: "{{parameters.description}}"
+          color: "{{parameters.color}}"
+
+    parameters:
+      - name: channel_id
+        label: Channel ID
+        type: string
+        required: true
+      - name: title
+        label: Embed Title
+        type: string
+        required: true
+        supports_templates: true
+      - name: description
+        label: Embed Description
+        type: string
+        required: false
+        supports_templates: true
+      - name: color
+        label: Embed Color
+        type: integer
+        required: false
+        default: 5814783
+        description: Decimal color value (e.g., 5814783 for blue)
+
+  get_channel:
+    name: get_channel
+    display_name: Get Channel Info
+    description: Get information about a Discord channel
+    type: http
+
+    method: GET
+    url: "https://discord.com/api/v10/channels/{{parameters.channel_id}}"
+    headers:
+      Authorization: "Bot {{auth.bot_token}}"
+
+    parameters:
+      - name: channel_id
+        label: Channel ID
+        type: string
+        required: true
+
+    response:
+      mappings:
+        id: "$.id"
+        name: "$.name"
+        type: "$.type"
+        guild_id: "$.guild_id"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify bot token is valid
+    type: http
+
+    method: GET
+    url: "https://discord.com/api/v10/users/@me"
+    headers:
+      Authorization: "Bot {{auth.bot_token}}"
+
+    parameters: []
+
+    response:
+      mappings:
+        bot_id: "$.id"
+        bot_name: "$.username"
+
+# Triggers (for future webhook support)
+triggers:
+  message_received:
+    name: message_received
+    display_name: Message Received
+    description: Triggered when a message is sent in a channel
+    type: webhook
+    webhook_path: /webhooks/discord/message
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://discord.com/developers/docs
+homepage_url: https://discord.com
+is_enabled: true
+supports_test_connection: true

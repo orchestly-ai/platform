@@ -1,0 +1,43 @@
+# Microsoft OAuth2 Configuration
+# Supports: Microsoft 365, Azure AD, Teams, OneDrive, Outlook
+
+id: microsoft
+name: microsoft
+display_name: Microsoft 365
+description: Connect to Microsoft 365, Teams, OneDrive, and Outlook
+icon_url: https://www.microsoft.com/favicon.ico
+
+oauth:
+  # OAuth endpoints (using common tenant for multi-tenant apps)
+  authorization_url: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+  token_url: https://login.microsoftonline.com/common/oauth2/v2.0/token
+  revoke_url: null  # Microsoft uses logout endpoint instead
+  userinfo_url: https://graph.microsoft.com/v1.0/me
+
+  # Credentials from environment
+  client_id_env: MICROSOFT_CLIENT_ID
+  client_secret_env: MICROSOFT_CLIENT_SECRET
+
+  # Default scopes (Microsoft Graph API)
+  default_scopes:
+    - openid
+    - email
+    - profile
+    - offline_access
+    - User.Read
+    - Mail.Read
+    - Calendars.Read
+    - Files.Read
+    - Team.ReadBasic.All
+
+  # Additional OAuth parameters
+  extra_params:
+    response_mode: query       # Return params in query string
+    prompt: consent            # Always show consent screen
+
+  # Token settings
+  token_expiry_buffer_seconds: 300  # Refresh 5 min before expiry
+
+  # Microsoft-specific: Required headers for Graph API
+  extra_headers:
+    Content-Type: application/x-www-form-urlencoded

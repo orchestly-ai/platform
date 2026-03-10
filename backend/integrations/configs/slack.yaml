@@ -1,0 +1,202 @@
+# Slack Integration
+# Send messages and interact with Slack workspaces
+
+id: slack
+name: Slack
+display_name: Slack
+description: Send messages and notifications to Slack channels
+long_description: |
+  Connect your Slack workspace to send automated messages, notifications,
+  and updates. Perfect for team alerts, status updates, and integrations.
+
+category: communication
+tags:
+  - messaging
+  - chat
+  - notifications
+  - team
+  - collaboration
+
+icon_url: /icons/slack.svg
+color: "#4A154B"
+
+# Authentication - OAuth2 via Nango
+auth:
+  type: oauth2
+  oauth:
+    provider: slack  # Nango provider key
+    scopes:
+      - chat:write
+      - channels:read
+      - users:read
+  # Fallback for bot tokens
+  fields:
+    - name: bot_token
+      label: Bot Token (Alternative)
+      type: password
+      required: false
+      help: |
+        If not using OAuth, you can provide a bot token directly:
+        1. Go to https://api.slack.com/apps
+        2. Select your app → OAuth & Permissions
+        3. Copy the "Bot User OAuth Token"
+
+# Actions
+actions:
+  send_message:
+    name: send_message
+    display_name: Send Message
+    description: Send a message to a Slack channel
+    type: http
+
+    method: POST
+    url: "https://slack.com/api/chat.postMessage"
+    headers:
+      Authorization: "Bearer {{auth.access_token}}"
+      Content-Type: "application/json"
+    body:
+      channel: "{{parameters.channel}}"
+      text: "{{parameters.text}}"
+
+    parameters:
+      - name: channel
+        label: Channel
+        type: string
+        required: true
+        description: Channel ID or name (e.g., #general or C1234567890)
+        help: Use channel ID for reliability (find in channel details)
+      - name: text
+        label: Message Text
+        type: string
+        required: true
+        description: The message to send
+        supports_templates: true
+
+    response:
+      mappings:
+        ok: "$.ok"
+        message_ts: "$.ts"
+        channel: "$.channel"
+
+  send_block_message:
+    name: send_block_message
+    display_name: Send Block Message
+    description: Send a rich formatted message using Block Kit
+    type: http
+
+    method: POST
+    url: "https://slack.com/api/chat.postMessage"
+    headers:
+      Authorization: "Bearer {{auth.access_token}}"
+      Content-Type: "application/json"
+    body:
+      channel: "{{parameters.channel}}"
+      blocks: "{{parameters.blocks}}"
+      text: "{{parameters.fallback_text}}"
+
+    parameters:
+      - name: channel
+        label: Channel
+        type: string
+        required: true
+      - name: blocks
+        label: Blocks (JSON)
+        type: object
+        required: true
+        description: Slack Block Kit blocks array
+      - name: fallback_text
+        label: Fallback Text
+        type: string
+        required: true
+        description: Text shown in notifications
+
+  list_channels:
+    name: list_channels
+    display_name: List Channels
+    description: Get a list of channels in the workspace
+    type: http
+
+    method: GET
+    url: "https://slack.com/api/conversations.list"
+    headers:
+      Authorization: "Bearer {{auth.access_token}}"
+    query_params:
+      types: "public_channel,private_channel"
+      limit: "{{parameters.limit}}"
+
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 100
+        description: Maximum number of channels to return
+
+    response:
+      mappings:
+        ok: "$.ok"
+        channels: "$.channels"
+
+  get_user_info:
+    name: get_user_info
+    display_name: Get User Info
+    description: Get information about a Slack user
+    type: http
+
+    method: GET
+    url: "https://slack.com/api/users.info"
+    headers:
+      Authorization: "Bearer {{auth.access_token}}"
+    query_params:
+      user: "{{parameters.user_id}}"
+
+    parameters:
+      - name: user_id
+        label: User ID
+        type: string
+        required: true
+        description: Slack user ID (e.g., U1234567890)
+
+    response:
+      mappings:
+        ok: "$.ok"
+        user: "$.user"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify authentication is valid
+    type: http
+
+    method: POST
+    url: "https://slack.com/api/auth.test"
+    headers:
+      Authorization: "Bearer {{auth.access_token}}"
+      Content-Type: "application/json"
+    body: {}
+
+    parameters: []
+
+    response:
+      mappings:
+        ok: "$.ok"
+        user: "$.user"
+        team: "$.team"
+        url: "$.url"
+
+# Triggers
+triggers:
+  message_received:
+    name: message_received
+    display_name: Message Received
+    description: Triggered when a message is posted
+    type: webhook
+    webhook_path: /webhooks/slack/events
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://api.slack.com/docs
+homepage_url: https://slack.com
+is_enabled: true
+requires_oauth: true
+supports_test_connection: true

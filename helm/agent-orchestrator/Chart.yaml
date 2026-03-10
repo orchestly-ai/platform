@@ -1,0 +1,28 @@
+apiVersion: v2
+name: agent-orchestrator
+description: Production-grade orchestration platform for multi-agent AI systems
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - agents
+  - ai
+  - orchestration
+  - llm
+  - automation
+home: https://github.com/orchestly-ai/platform
+sources:
+  - https://github.com/orchestly-ai/platform
+maintainers:
+  - name: Orchestly Team
+    email: support@orchestly.dev
+icon: https://raw.githubusercontent.com/orchestly-ai/platform/main/docs/logo.png
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: "18.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

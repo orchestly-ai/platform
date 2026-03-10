@@ -1,0 +1,36 @@
+# Slack OAuth2 Configuration
+# Supports: Messaging, Channels, Users
+
+id: slack
+name: slack
+display_name: Slack
+description: Connect to Slack workspaces for messaging and notifications
+icon_url: https://slack.com/favicon.ico
+
+oauth:
+  # OAuth endpoints (Slack uses V2)
+  authorization_url: https://slack.com/oauth/v2/authorize
+  token_url: https://slack.com/api/oauth.v2.access
+  revoke_url: https://slack.com/api/auth.revoke
+  userinfo_url: https://slack.com/api/auth.test
+
+  # Credentials from environment
+  client_id_env: SLACK_CLIENT_ID
+  client_secret_env: SLACK_CLIENT_SECRET
+
+  # Default scopes (bot token scopes)
+  default_scopes:
+    - channels:read
+    - channels:history
+    - chat:write
+    - users:read
+    - team:read
+
+  # User token scopes (if needed)
+  user_scopes:
+    - identity.basic
+    - identity.email
+
+  # Token settings
+  # Note: Slack tokens don't expire, but we track them anyway
+  token_expiry_buffer_seconds: 0

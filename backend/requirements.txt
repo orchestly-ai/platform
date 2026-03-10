@@ -1,0 +1,67 @@
+# ============================================================================
+# Agent Orchestration Platform - Backend Dependencies
+# ============================================================================
+
+# Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic[email]>=2.5.3
+pydantic-settings>=2.1.0
+
+# Database
+sqlalchemy>=2.0.25
+asyncpg>=0.29.0
+alembic>=1.13.1
+psycopg2-binary>=2.9.9
+aiosqlite>=0.19.0  # SQLite async support for local development
+
+# Redis & Caching
+redis>=5.0.1
+hiredis>=2.3.2
+
+# Task Queue
+celery>=5.3.6
+flower>=2.0.1
+
+# HTTP Client
+httpx>=0.25.0
+aiohttp>=3.9.1
+
+# LLM Providers
+openai>=1.10.0
+anthropic>=0.8.1
+
+# Auth
+PyJWT>=2.8.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+cryptography>=42.0.0
+
+# Observability
+prometheus-client>=0.19.0
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-instrumentation-fastapi>=0.43b0
+structlog>=24.1.0
+
+# Utilities
+typer>=0.9.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+jinja2>=3.1.3
+tenacity>=8.2.3
+croniter>=2.0.1  # Cron expression parsing for scheduler
+scipy>=1.10.0  # Statistical testing for A/B experiments
+
+# Development
+pytest>=7.4.4
+pytest-asyncio>=0.23.3
+pytest-cov>=4.1.0
+black>=24.1.1
+ruff>=0.1.14
+mypy>=1.8.0
+
+# Type stubs
+types-redis>=4.6.0
+types-pyyaml>=6.0.12

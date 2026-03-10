@@ -1,0 +1,314 @@
+# Salesforce Integration
+# Enterprise CRM platform
+
+id: salesforce
+name: salesforce
+display_name: Salesforce
+description: Enterprise CRM platform for sales, service, and marketing
+category: crm
+icon_url: https://www.salesforce.com/favicon.ico
+version: "1.0.0"
+documentation_url: https://developer.salesforce.com/docs/apis
+
+auth:
+  type: oauth2
+  oauth:
+    provider: salesforce
+    scopes:
+      - api
+      - refresh_token
+      - offline_access
+  fields:
+    - name: access_token
+      label: Access Token
+      type: password
+      required: true
+      help: |
+        For API key auth, use a Connected App:
+        1. Setup > App Manager > New Connected App
+        2. Enable OAuth Settings
+        3. Generate access token via OAuth flow
+    - name: instance_url
+      label: Instance URL
+      type: string
+      required: true
+      placeholder: "https://yourcompany.salesforce.com"
+      help: Your Salesforce instance URL
+
+actions:
+  # Account Actions
+  list_accounts:
+    name: List Accounts
+    description: Query accounts using SOQL
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/query"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        q: "SELECT Id, Name, Type, Industry, Phone, Website FROM Account LIMIT {{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  get_account:
+    name: Get Account
+    description: Get a specific account by ID
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects/Account/{{parameters.account_id}}"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+    parameters:
+      - name: account_id
+        label: Account ID
+        type: string
+        required: true
+
+  create_account:
+    name: Create Account
+    description: Create a new account
+    type: http
+    http:
+      method: POST
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects/Account"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+        Content-Type: application/json
+      body:
+        Name: "{{parameters.name}}"
+        Type: "{{parameters.type}}"
+        Industry: "{{parameters.industry}}"
+        Phone: "{{parameters.phone}}"
+        Website: "{{parameters.website}}"
+    parameters:
+      - name: name
+        label: Account Name
+        type: string
+        required: true
+      - name: type
+        label: Type
+        type: string
+        required: false
+        enum: [Prospect, Customer - Direct, Customer - Channel, Partner]
+      - name: industry
+        label: Industry
+        type: string
+        required: false
+      - name: phone
+        label: Phone
+        type: string
+        required: false
+      - name: website
+        label: Website
+        type: string
+        required: false
+
+  # Contact Actions
+  list_contacts:
+    name: List Contacts
+    description: Query contacts using SOQL
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/query"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        q: "SELECT Id, FirstName, LastName, Email, Phone, AccountId FROM Contact LIMIT {{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  create_contact:
+    name: Create Contact
+    description: Create a new contact
+    type: http
+    http:
+      method: POST
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects/Contact"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+        Content-Type: application/json
+      body:
+        FirstName: "{{parameters.first_name}}"
+        LastName: "{{parameters.last_name}}"
+        Email: "{{parameters.email}}"
+        Phone: "{{parameters.phone}}"
+        AccountId: "{{parameters.account_id}}"
+    parameters:
+      - name: first_name
+        label: First Name
+        type: string
+        required: false
+      - name: last_name
+        label: Last Name
+        type: string
+        required: true
+      - name: email
+        label: Email
+        type: string
+        required: false
+      - name: phone
+        label: Phone
+        type: string
+        required: false
+      - name: account_id
+        label: Account ID
+        type: string
+        required: false
+
+  # Lead Actions
+  list_leads:
+    name: List Leads
+    description: Query leads using SOQL
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/query"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        q: "SELECT Id, FirstName, LastName, Email, Company, Status FROM Lead LIMIT {{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  create_lead:
+    name: Create Lead
+    description: Create a new lead
+    type: http
+    http:
+      method: POST
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects/Lead"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+        Content-Type: application/json
+      body:
+        FirstName: "{{parameters.first_name}}"
+        LastName: "{{parameters.last_name}}"
+        Email: "{{parameters.email}}"
+        Company: "{{parameters.company}}"
+        Status: "{{parameters.status}}"
+    parameters:
+      - name: first_name
+        label: First Name
+        type: string
+        required: false
+      - name: last_name
+        label: Last Name
+        type: string
+        required: true
+      - name: email
+        label: Email
+        type: string
+        required: false
+      - name: company
+        label: Company
+        type: string
+        required: true
+      - name: status
+        label: Status
+        type: string
+        required: false
+        default: "Open - Not Contacted"
+
+  # Opportunity Actions
+  list_opportunities:
+    name: List Opportunities
+    description: Query opportunities using SOQL
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/query"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        q: "SELECT Id, Name, Amount, StageName, CloseDate, AccountId FROM Opportunity LIMIT {{parameters.limit}}"
+    parameters:
+      - name: limit
+        label: Limit
+        type: integer
+        required: false
+        default: 10
+
+  create_opportunity:
+    name: Create Opportunity
+    description: Create a new opportunity
+    type: http
+    http:
+      method: POST
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects/Opportunity"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+        Content-Type: application/json
+      body:
+        Name: "{{parameters.name}}"
+        Amount: "{{parameters.amount}}"
+        StageName: "{{parameters.stage}}"
+        CloseDate: "{{parameters.close_date}}"
+        AccountId: "{{parameters.account_id}}"
+    parameters:
+      - name: name
+        label: Opportunity Name
+        type: string
+        required: true
+      - name: amount
+        label: Amount
+        type: number
+        required: false
+      - name: stage
+        label: Stage
+        type: string
+        required: true
+        default: "Prospecting"
+      - name: close_date
+        label: Close Date
+        type: string
+        required: true
+        placeholder: "YYYY-MM-DD"
+      - name: account_id
+        label: Account ID
+        type: string
+        required: false
+
+  # Generic SOQL Query
+  soql_query:
+    name: SOQL Query
+    description: Execute a custom SOQL query
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/query"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+      query_params:
+        q: "{{parameters.query}}"
+    parameters:
+      - name: query
+        label: SOQL Query
+        type: string
+        required: true
+        placeholder: "SELECT Id, Name FROM Account LIMIT 10"
+
+  test_connection:
+    name: Test Connection
+    description: Verify Salesforce credentials
+    type: http
+    http:
+      method: GET
+      url: "{{auth.instance_url}}/services/data/v58.0/sobjects"
+      headers:
+        Authorization: "Bearer {{auth.access_token}}"
+    parameters: []

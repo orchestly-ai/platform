@@ -1,0 +1,128 @@
+{
+  "name": "Data Processing Pipeline",
+  "description": "ETL pipeline with AI-powered data extraction, transformation, validation, and loading",
+  "tags": ["data-engineering", "etl", "automation", "data-quality"],
+  "isTemplate": true,
+  "nodes": [
+    {
+      "id": "supervisor-1",
+      "type": "supervisor",
+      "position": { "x": 300, "y": 50 },
+      "data": {
+        "label": "Pipeline Orchestrator",
+        "type": "supervisor",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["orchestration", "error-handling", "monitoring"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-1",
+      "type": "tool",
+      "position": { "x": 100, "y": 180 },
+      "data": {
+        "label": "Data Source",
+        "type": "tool",
+        "tools": ["api_client", "database_connector", "file_reader"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-1",
+      "type": "worker",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Data Extractor",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["extraction", "parsing", "schema-detection"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-2",
+      "type": "worker",
+      "position": { "x": 400, "y": 180 },
+      "data": {
+        "label": "Data Transformer",
+        "type": "worker",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["transformation", "normalization", "enrichment"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-3",
+      "type": "worker",
+      "position": { "x": 550, "y": 180 },
+      "data": {
+        "label": "Data Validator",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["validation", "quality-check", "anomaly-detection"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-2",
+      "type": "tool",
+      "position": { "x": 300, "y": 310 },
+      "data": {
+        "label": "Data Warehouse",
+        "type": "tool",
+        "tools": ["postgres_db", "bigquery_api", "s3_storage"],
+        "status": "idle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supervisor-1",
+      "target": "tool-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Trigger"
+    },
+    {
+      "id": "e2",
+      "source": "tool-1",
+      "target": "worker-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Raw Data"
+    },
+    {
+      "id": "e3",
+      "source": "worker-1",
+      "target": "worker-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Extracted"
+    },
+    {
+      "id": "e4",
+      "source": "worker-2",
+      "target": "worker-3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Transformed"
+    },
+    {
+      "id": "e5",
+      "source": "worker-3",
+      "target": "tool-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Validated"
+    },
+    {
+      "id": "e6",
+      "source": "tool-2",
+      "target": "supervisor-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Loaded"
+    }
+  ]
+}

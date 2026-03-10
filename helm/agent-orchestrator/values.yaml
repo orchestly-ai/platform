@@ -1,0 +1,244 @@
+# Default values for agent-orchestrator
+
+# Global settings
+global:
+  environment: production
+  debug: false
+
+# Replica counts
+replicaCount:
+  api: 3
+  dashboard: 2
+
+# Image configuration
+image:
+  api:
+    repository: agent-orchestrator/api
+    tag: latest
+    pullPolicy: IfNotPresent
+  dashboard:
+    repository: agent-orchestrator/dashboard
+    tag: latest
+    pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  api:
+    port: 8000
+    metricsPort: 9090
+  dashboard:
+    port: 3000
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: api.agent-orchestrator.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api
+    - host: dashboard.agent-orchestrator.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+  tls:
+    - secretName: agent-orchestrator-tls
+      hosts:
+        - api.agent-orchestrator.example.com
+        - dashboard.agent-orchestrator.example.com
+
+# Resource limits
+resources:
+  api:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  dashboard:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: "" # Set in secrets
+    database: agent_orchestrator
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "2000m"
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+
+# Application configuration
+config:
+  # API
+  apiHost: "0.0.0.0"
+  apiPort: 8000
+  apiWorkers: 4
+
+  # Logging
+  logLevel: INFO
+  logFormat: json
+
+  # Features
+  enableMetrics: true
+  enableTracing: false
+  enableVisualWorkflowDesigner: false
+
+  # Rate Limiting
+  rateLimitEnabled: true
+  rateLimitRequestsPerMinute: 100
+  rateLimitRequestsPerHour: 5000
+
+  # Cost Limits
+  defaultAgentDailyCostLimit: 100.0
+  defaultAgentMonthlyCostLimit: 3000.0
+  systemDailyCostLimit: 10000.0
+  systemMonthlyCostLimit: 300000.0
+
+  # Task Configuration
+  defaultTaskTimeoutSeconds: 300
+  maxTaskTimeoutSeconds: 3600
+  defaultMaxRetries: 3
+  maxConcurrentTasksPerAgent: 5
+
+  # Queue
+  queueTtlSeconds: 86400
+
+  # CORS
+  corsOrigins:
+    - "http://localhost:3000"
+    - "http://localhost:3001"
+    - "https://dashboard.agent-orchestrator.example.com"
+
+# Secrets (use external secrets manager in production)
+secrets:
+  # JWT
+  jwtSecretKey: "CHANGE_ME_MINIMUM_32_CHARACTERS_LONG"
+
+  # LLM Providers
+  openaiApiKey: ""
+  anthropicApiKey: ""
+
+  # Observability
+  sentryDsn: ""
+  datadogApiKey: ""
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+
+# Network policies
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+# Pod security
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Node selection
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - agent-orchestrator
+          topologyKey: kubernetes.io/hostname

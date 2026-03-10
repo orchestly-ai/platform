@@ -1,0 +1,157 @@
+# OpenAI Integration
+# Access GPT models for text generation, chat, and more
+
+id: openai
+name: OpenAI
+display_name: OpenAI
+description: Generate text, chat completions, and embeddings using GPT models
+long_description: |
+  Connect to OpenAI's API to use GPT-4, GPT-3.5, and other models for
+  text generation, chat completions, embeddings, and more.
+
+category: ai
+tags:
+  - llm
+  - ai
+  - gpt
+  - text-generation
+  - chat
+
+icon_url: /icons/openai.svg
+color: "#10A37F"
+
+# Authentication
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: API Key
+      type: password
+      required: true
+      help: |
+        Get your API key from OpenAI:
+        1. Go to https://platform.openai.com/api-keys
+        2. Click "Create new secret key"
+        3. Copy and paste the key here
+
+# Actions
+actions:
+  chat_completion:
+    name: chat_completion
+    display_name: Chat Completion
+    description: Generate a chat response using GPT models
+    type: http
+
+    method: POST
+    url: "https://api.openai.com/v1/chat/completions"
+    headers:
+      Authorization: "Bearer {{auth.api_key}}"
+      Content-Type: "application/json"
+    body:
+      model: "{{parameters.model}}"
+      messages:
+        - role: "user"
+          content: "{{parameters.prompt}}"
+      temperature: "{{parameters.temperature}}"
+      max_tokens: "{{parameters.max_tokens}}"
+
+    parameters:
+      - name: prompt
+        label: Prompt
+        type: string
+        required: true
+        description: The prompt or question to send to the model
+        supports_templates: true
+      - name: model
+        label: Model
+        type: string
+        required: false
+        default: "gpt-4o-mini"
+        enum:
+          - gpt-4o
+          - gpt-4o-mini
+          - gpt-4-turbo
+          - gpt-4
+          - gpt-3.5-turbo
+      - name: temperature
+        label: Temperature
+        type: number
+        required: false
+        default: 0.7
+        description: Creativity level (0-2, higher = more creative)
+      - name: max_tokens
+        label: Max Tokens
+        type: integer
+        required: false
+        default: 1000
+        description: Maximum length of the response
+
+    response:
+      mappings:
+        text: "$.choices[0].message.content"
+        model: "$.model"
+        prompt_tokens: "$.usage.prompt_tokens"
+        completion_tokens: "$.usage.completion_tokens"
+        total_tokens: "$.usage.total_tokens"
+
+  create_embedding:
+    name: create_embedding
+    display_name: Create Embedding
+    description: Generate vector embeddings for text
+    type: http
+
+    method: POST
+    url: "https://api.openai.com/v1/embeddings"
+    headers:
+      Authorization: "Bearer {{auth.api_key}}"
+      Content-Type: "application/json"
+    body:
+      model: "{{parameters.model}}"
+      input: "{{parameters.text}}"
+
+    parameters:
+      - name: text
+        label: Text
+        type: string
+        required: true
+        description: Text to generate embeddings for
+        supports_templates: true
+      - name: model
+        label: Model
+        type: string
+        required: false
+        default: "text-embedding-3-small"
+        enum:
+          - text-embedding-3-small
+          - text-embedding-3-large
+          - text-embedding-ada-002
+
+    response:
+      mappings:
+        embedding: "$.data[0].embedding"
+        model: "$.model"
+        total_tokens: "$.usage.total_tokens"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify API key is valid
+    type: http
+
+    method: GET
+    url: "https://api.openai.com/v1/models"
+    headers:
+      Authorization: "Bearer {{auth.api_key}}"
+
+    parameters: []
+
+    response:
+      mappings:
+        models: "$.data"
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://platform.openai.com/docs
+homepage_url: https://openai.com
+is_enabled: true
+supports_test_connection: true

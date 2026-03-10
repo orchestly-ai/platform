@@ -1,0 +1,129 @@
+{
+  "name": "Content Creation Workflow",
+  "description": "AI-powered content creation pipeline from brief to published content with review stages",
+  "tags": ["content", "writing", "automation", "publishing"],
+  "isTemplate": true,
+  "nodes": [
+    {
+      "id": "supervisor-1",
+      "type": "supervisor",
+      "position": { "x": 300, "y": 50 },
+      "data": {
+        "label": "Content Director",
+        "type": "supervisor",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["editorial-oversight", "quality-control", "publishing-workflow"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-1",
+      "type": "worker",
+      "position": { "x": 100, "y": 180 },
+      "data": {
+        "label": "Research Agent",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["research", "fact-checking", "source-gathering"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-2",
+      "type": "worker",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Content Writer",
+        "type": "worker",
+        "llmModel": "claude-3-5-sonnet-20241022",
+        "capabilities": ["writing", "tone-matching", "seo-optimization"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-3",
+      "type": "worker",
+      "position": { "x": 400, "y": 180 },
+      "data": {
+        "label": "Editor",
+        "type": "worker",
+        "llmModel": "gpt-4",
+        "capabilities": ["editing", "grammar-check", "fact-verification"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "worker-4",
+      "type": "worker",
+      "position": { "x": 550, "y": 180 },
+      "data": {
+        "label": "SEO Optimizer",
+        "type": "worker",
+        "llmModel": "gpt-3.5-turbo",
+        "capabilities": ["seo", "keyword-optimization", "meta-generation"],
+        "status": "idle"
+      }
+    },
+    {
+      "id": "tool-1",
+      "type": "tool",
+      "position": { "x": 300, "y": 310 },
+      "data": {
+        "label": "Publishing Platform",
+        "type": "tool",
+        "tools": ["wordpress_api", "medium_api", "social_media_api"],
+        "status": "idle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supervisor-1",
+      "target": "worker-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Content Brief"
+    },
+    {
+      "id": "e2",
+      "source": "worker-1",
+      "target": "worker-2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Research Complete"
+    },
+    {
+      "id": "e3",
+      "source": "worker-2",
+      "target": "worker-3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "First Draft"
+    },
+    {
+      "id": "e4",
+      "source": "worker-3",
+      "target": "worker-4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Edited Content"
+    },
+    {
+      "id": "e5",
+      "source": "worker-4",
+      "target": "tool-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "SEO Optimized"
+    },
+    {
+      "id": "e6",
+      "source": "tool-1",
+      "target": "supervisor-1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Published"
+    }
+  ]
+}

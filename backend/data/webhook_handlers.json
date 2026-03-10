@@ -1,0 +1,10 @@
+{
+  "stripe.*": [
+    {
+      "event_type": "stripe.*",
+      "handler_type": "log",
+      "handler_config": {},
+      "enabled": true
+    }
+  ]
+}

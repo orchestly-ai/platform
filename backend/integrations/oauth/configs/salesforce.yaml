@@ -1,0 +1,42 @@
+# Salesforce OAuth2 Configuration
+# Supports: Sales Cloud, Service Cloud, Custom Objects
+
+id: salesforce
+name: salesforce
+display_name: Salesforce
+description: Connect to Salesforce CRM, leads, opportunities, and custom objects
+icon_url: https://www.salesforce.com/favicon.ico
+
+oauth:
+  # OAuth endpoints (using login.salesforce.com for production)
+  # For sandbox, use test.salesforce.com
+  authorization_url: https://login.salesforce.com/services/oauth2/authorize
+  token_url: https://login.salesforce.com/services/oauth2/token
+  revoke_url: https://login.salesforce.com/services/oauth2/revoke
+  userinfo_url: https://login.salesforce.com/services/oauth2/userinfo
+
+  # Credentials from environment
+  client_id_env: SALESFORCE_CLIENT_ID
+  client_secret_env: SALESFORCE_CLIENT_SECRET
+
+  # Default scopes
+  default_scopes:
+    - api                      # Access REST API
+    - refresh_token            # Get refresh token
+    - openid                   # OpenID Connect
+    - profile                  # User profile
+    - email                    # User email
+    - id                       # Identity URL
+
+  # Additional OAuth parameters
+  extra_params:
+    prompt: consent            # Always show consent screen
+    display: page              # Full page authorization
+
+  # Token settings
+  token_expiry_buffer_seconds: 300  # Refresh 5 min before expiry
+
+  # Salesforce-specific notes:
+  # - Instance URL is returned in token response, must be used for API calls
+  # - Token response includes 'instance_url' field
+  # - API version should be specified in calls (e.g., /services/data/v58.0/)

@@ -1,0 +1,92 @@
+# Monday.com Integration
+# Work management platform
+
+id: monday
+name: monday
+display_name: Monday.com
+description: Work OS for teams to run projects and workflows
+category: project_management
+icon_url: https://monday.com/favicon.ico
+version: "1.0.0"
+documentation_url: https://developer.monday.com/api-reference
+
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: API Token
+      type: password
+      required: true
+      help: |
+        Get your API token:
+        1. Click your avatar > Admin > API
+        2. Copy your personal API token
+
+actions:
+  list_boards:
+    name: List Boards
+    description: Get all boards
+    type: http
+    http:
+      method: POST
+      url: "https://api.monday.com/v2"
+      headers:
+        Authorization: "{{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        query: "{ boards { id name state } }"
+    parameters: []
+
+  get_board_items:
+    name: Get Board Items
+    description: Get items from a board
+    type: http
+    http:
+      method: POST
+      url: "https://api.monday.com/v2"
+      headers:
+        Authorization: "{{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        query: "{ boards(ids: [{{parameters.board_id}}]) { items_page { items { id name } } } }"
+    parameters:
+      - name: board_id
+        label: Board ID
+        type: integer
+        required: true
+
+  create_item:
+    name: Create Item
+    description: Create a new item in a board
+    type: http
+    http:
+      method: POST
+      url: "https://api.monday.com/v2"
+      headers:
+        Authorization: "{{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        query: "mutation { create_item(board_id: {{parameters.board_id}}, item_name: \"{{parameters.item_name}}\") { id name } }"
+    parameters:
+      - name: board_id
+        label: Board ID
+        type: integer
+        required: true
+      - name: item_name
+        label: Item Name
+        type: string
+        required: true
+
+  test_connection:
+    name: Test Connection
+    description: Verify Monday.com credentials
+    type: http
+    http:
+      method: POST
+      url: "https://api.monday.com/v2"
+      headers:
+        Authorization: "{{auth.api_key}}"
+        Content-Type: application/json
+      body:
+        query: "{ me { id name } }"
+    parameters: []
