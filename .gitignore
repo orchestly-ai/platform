@@ -60,3 +60,7 @@ backup_*/
 *.pem
 *.key
 *.crt
+
+# Backup files
+*.bak
+*.backup
