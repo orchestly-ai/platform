@@ -165,8 +165,15 @@ class IntegrationRegistry:
     # ============ Lookup Methods ============
 
     def get(self, integration_id: str) -> Optional[IntegrationConfig]:
-        """Get an integration by ID."""
-        return self._integrations.get(integration_id)
+        """Get an integration by ID. Auto-reloads configs on cache miss."""
+        result = self._integrations.get(integration_id)
+        if result is None:
+            # Reload from disk in case new YAML files were added
+            default_dir = os.path.join(os.path.dirname(__file__), "configs")
+            if os.path.exists(default_dir):
+                self.load_from_directory(default_dir)
+            result = self._integrations.get(integration_id)
+        return result
 
     def get_all(self) -> List[IntegrationConfig]:
         """Get all registered integrations."""

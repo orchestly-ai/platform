@@ -1,8 +1,8 @@
 # Google Drive Integration
 # OAuth2 authentication with Google
 
-id: google_drive
-name: google_drive
+id: google-drive
+name: google-drive
 display_name: Google Drive
 description: Store, sync, and share files with Google Drive
 category: storage

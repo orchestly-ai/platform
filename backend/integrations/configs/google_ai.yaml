@@ -1,0 +1,121 @@
+# Google AI (Gemini) Integration
+# Access Gemini models for text generation, chat, and multimodal tasks
+
+id: google-ai
+name: Google AI
+display_name: Google AI (Gemini)
+description: Gemini Pro, Gemini Flash and other Google AI models
+long_description: |
+  Connect to Google's Gemini API for text generation, chat completions,
+  and multimodal tasks. Access Gemini 1.5 Pro, Gemini 1.5 Flash, and
+  other Google AI models.
+
+category: ai
+tags:
+  - llm
+  - ai
+  - gemini
+  - google
+  - text-generation
+  - chat
+
+icon_url: /icons/google-ai.svg
+color: "#8e75b2"
+
+# Authentication
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: API Key
+      type: password
+      required: true
+      help: |
+        Get your API key from Google AI Studio:
+        1. Go to https://aistudio.google.com/apikey
+        2. Click "Create API key"
+        3. Copy and paste the key here
+
+# Actions
+actions:
+  chat_completion:
+    name: chat_completion
+    display_name: Chat Completion
+    description: Generate text using Gemini models
+    type: http
+
+    method: POST
+    url: "https://generativelanguage.googleapis.com/v1beta/models/{{parameters.model}}:generateContent?key={{auth.api_key}}"
+    headers:
+      Content-Type: "application/json"
+    body:
+      contents:
+        - parts:
+            - text: "{{parameters.prompt}}"
+      generationConfig:
+        temperature: "{{parameters.temperature}}"
+        maxOutputTokens: "{{parameters.max_tokens}}"
+
+    parameters:
+      - name: prompt
+        label: Prompt
+        type: string
+        required: true
+        description: The prompt or question to send to Gemini
+        supports_templates: true
+      - name: model
+        label: Model
+        type: string
+        required: false
+        default: "gemini-1.5-flash"
+        enum:
+          - gemini-2.0-flash
+          - gemini-1.5-pro
+          - gemini-1.5-flash
+        description: |
+          Available models:
+          - gemini-2.0-flash: Latest and fastest
+          - gemini-1.5-pro: Best quality for complex tasks
+          - gemini-1.5-flash: Fast and efficient
+      - name: temperature
+        label: Temperature
+        type: number
+        required: false
+        default: 0.7
+        description: Creativity level (0-2, higher = more creative)
+      - name: max_tokens
+        label: Max Tokens
+        type: integer
+        required: false
+        default: 1000
+        description: Maximum length of the response
+
+    response:
+      mappings:
+        text: "$.candidates[0].content.parts[0].text"
+        finish_reason: "$.candidates[0].finishReason"
+        prompt_tokens: "$.usageMetadata.promptTokenCount"
+        completion_tokens: "$.usageMetadata.candidatesTokenCount"
+        total_tokens: "$.usageMetadata.totalTokenCount"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify API key is valid
+    type: http
+
+    method: GET
+    url: "https://generativelanguage.googleapis.com/v1beta/models?key={{auth.api_key}}"
+
+    parameters: []
+
+    response:
+      mappings:
+        models: "$.models"
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://ai.google.dev/docs
+homepage_url: https://ai.google.dev
+is_enabled: true
+supports_test_connection: true

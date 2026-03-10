@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef, DragEvent } from 'react'
-import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { useSearchParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
 import ReactFlow, {
   Node,
   Edge,
@@ -22,7 +22,8 @@ import {
   AlertCircle, Undo2, Redo2, Crown, Cpu, Wrench, Zap, GitBranch,
   MessageSquare, CreditCard, Github, Mail, Phone, Cloud, Headphones,
   Users, BarChart3, FileSpreadsheet, Plug, GripVertical, Sparkles,
-  Database, BookOpen, Webhook, UserCheck, Terminal
+  Database, BookOpen, Webhook, UserCheck, Terminal,
+  PanelLeftClose, PanelLeftOpen
 } from 'lucide-react'
 import { AgentNodeData, NodeType, IntegrationType, WebhookAuthType } from '../types'
 import api from '../services/api'
@@ -547,6 +548,26 @@ function WorkflowDesignerInner() {
   // Dynamic integration palette
   const [integrationPaletteItems, setIntegrationPaletteItems] = useState<IntegrationPaletteItem[]>(staticIntegrationPaletteItems)
   const [loadingIntegrations, setLoadingIntegrations] = useState(false)
+
+  // Collapsible node palette
+  const [paletteExpanded, setPaletteExpanded] = useState(false)
+
+  // Auto-collapse global sidebar on mount, restore on unmount
+  const outletContext = useOutletContext<{ sidebarCollapsed: boolean, setSidebarCollapsed: (collapsed: boolean) => void }>()
+  const prevSidebarStateRef = useRef<boolean | null>(null)
+
+  useEffect(() => {
+    if (!outletContext?.setSidebarCollapsed) return
+    // Save current state before collapsing
+    if (prevSidebarStateRef.current === null) {
+      prevSidebarStateRef.current = outletContext.sidebarCollapsed
+    }
+    outletContext.setSidebarCollapsed(true)
+    return () => {
+      // Restore previous state on unmount
+      outletContext.setSidebarCollapsed(prevSidebarStateRef.current ?? false)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Function to fetch integrations - extracted so it can be called on mount and on focus
   const fetchIntegrations = useCallback(async () => {
@@ -1766,132 +1787,175 @@ function WorkflowDesignerInner() {
 
       <div className="flex-1 flex">
         {/* Left Sidebar - Node Palette with Drag & Drop */}
-        <div className="w-72 bg-gray-50 border-r border-gray-200 overflow-y-auto">
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Node Palette</h3>
-            <p className="text-xs text-gray-500 mb-4">Drag nodes onto the canvas</p>
-
-            {/* Triggers Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-orange-500" />
-                Triggers
-              </h4>
-              <div className="space-y-2">
-                {triggerPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`trigger-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+        {paletteExpanded ? (
+          <div className="w-72 bg-gray-50 border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold">Node Palette</h3>
+                <button
+                  onClick={() => setPaletteExpanded(false)}
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Collapse palette"
+                >
+                  <PanelLeftClose className="w-4 h-4 text-gray-500" />
+                </button>
               </div>
-            </div>
+              <p className="text-xs text-gray-500 mb-4">Drag nodes onto the canvas</p>
 
-            {/* Agents Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Crown className="w-4 h-4 text-purple-500" />
-                Agents
-              </h4>
-              <div className="space-y-2">
-                {agentPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`agent-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Triggers Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-orange-500" />
+                  Triggers
+                </h4>
+                <div className="space-y-2">
+                  {triggerPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`trigger-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Logic Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <GitBranch className="w-4 h-4 text-amber-500" />
-                Logic
-              </h4>
-              <div className="space-y-2">
-                {conditionPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`condition-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Agents Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-purple-500" />
+                  Agents
+                </h4>
+                <div className="space-y-2">
+                  {agentPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`agent-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Data Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Database className="w-4 h-4 text-indigo-500" />
-                Data & Knowledge
-              </h4>
-              <div className="space-y-2">
-                {dataPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`data-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Logic Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-amber-500" />
+                  Logic
+                </h4>
+                <div className="space-y-2">
+                  {conditionPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`condition-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Utilities Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-teal-500" />
-                Utilities
-              </h4>
-              <div className="space-y-2">
-                {utilityPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`utility-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Data Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Database className="w-4 h-4 text-indigo-500" />
+                  Data & Knowledge
+                </h4>
+                <div className="space-y-2">
+                  {dataPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`data-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Events & Automation Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Webhook className="w-4 h-4 text-purple-500" />
-                Events & Automation
-              </h4>
-              <div className="space-y-2">
-                {eventPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`event-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Utilities Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-teal-500" />
+                  Utilities
+                </h4>
+                <div className="space-y-2">
+                  {utilityPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`utility-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Integrations Section */}
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Plug className="w-4 h-4 text-indigo-500" />
-                Integrations
-              </h4>
-              <div className="space-y-2">
-                {integrationPaletteItems.map((item, idx) => (
-                  <DraggablePaletteItem
-                    key={`integration-${idx}`}
-                    item={item}
-                    onDragStart={onDragStart}
-                  />
-                ))}
+              {/* Events & Automation Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Webhook className="w-4 h-4 text-purple-500" />
+                  Events & Automation
+                </h4>
+                <div className="space-y-2">
+                  {eventPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`event-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
+              {/* Integrations Section */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Plug className="w-4 h-4 text-indigo-500" />
+                  Integrations
+                </h4>
+                <div className="space-y-2">
+                  {integrationPaletteItems.map((item, idx) => (
+                    <DraggablePaletteItem
+                      key={`integration-${idx}`}
+                      item={item}
+                      onDragStart={onDragStart}
+                    />
+                  ))}
+                </div>
+              </div>
+
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Collapsed palette - vertical icon strip */
+          <div className="w-12 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-2 flex-shrink-0">
+            <button
+              onClick={() => setPaletteExpanded(true)}
+              className="p-2 hover:bg-gray-200 rounded mb-2"
+              title="Expand palette"
+            >
+              <PanelLeftOpen className="w-4 h-4 text-gray-500" />
+            </button>
+            <div className="w-6 border-t border-gray-300 mb-2" />
+            {[
+              { icon: <Zap className="w-4 h-4" />, label: 'Triggers', color: 'text-orange-500', items: triggerPaletteItems, prefix: 'trigger' },
+              { icon: <Crown className="w-4 h-4" />, label: 'Agents', color: 'text-purple-500', items: agentPaletteItems, prefix: 'agent' },
+              { icon: <GitBranch className="w-4 h-4" />, label: 'Logic', color: 'text-amber-500', items: conditionPaletteItems, prefix: 'condition' },
+              { icon: <Database className="w-4 h-4" />, label: 'Data', color: 'text-indigo-500', items: dataPaletteItems, prefix: 'data' },
+              { icon: <Terminal className="w-4 h-4" />, label: 'Utilities', color: 'text-teal-500', items: utilityPaletteItems, prefix: 'utility' },
+              { icon: <Webhook className="w-4 h-4" />, label: 'Events', color: 'text-purple-500', items: eventPaletteItems, prefix: 'event' },
+              { icon: <Plug className="w-4 h-4" />, label: 'Integrations', color: 'text-indigo-500', items: integrationPaletteItems, prefix: 'integration' },
+            ].map((category) => (
+              <button
+                key={category.prefix}
+                onClick={() => setPaletteExpanded(true)}
+                className={`p-2 hover:bg-gray-200 rounded mb-1 ${category.color}`}
+                title={category.label}
+                draggable={category.items.length === 1}
+                onDragStart={category.items.length === 1 ? (e) => onDragStart(e as any, category.items[0]) : undefined}
+              >
+                {category.icon}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Center - Workflow Canvas */}
         <div className="flex-1 relative" ref={reactFlowWrapper}>
@@ -1935,12 +1999,20 @@ function WorkflowDesignerInner() {
               </p>
             </Panel>
           </ReactFlow>
-        </div>
 
-        {/* Right Sidebar - Node Properties */}
-        {selectedNode && (
-          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Node Properties</h3>
+          {/* Right Sidebar - Node Properties (Overlay) */}
+          {selectedNode && (
+            <div className="absolute right-0 top-0 h-full w-80 bg-white border-l border-gray-200 shadow-xl z-10 p-4 overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Node Properties</h3>
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                  title="Close properties"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             <div className="space-y-4">
               {/* Label - Common to all nodes */}
               <div>
@@ -4427,6 +4499,7 @@ function WorkflowDesignerInner() {
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* Toast Notification */}

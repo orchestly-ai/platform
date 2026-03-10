@@ -20,7 +20,7 @@ export function DashboardLayout() {
         <Header />
 
         <main className="dashboard-content">
-          <Outlet />
+          <Outlet context={{ sidebarCollapsed, setSidebarCollapsed }} />
         </main>
       </div>
     </div>

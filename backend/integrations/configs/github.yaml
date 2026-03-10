@@ -1,0 +1,203 @@
+# GitHub Integration
+# OAuth2 or Personal Access Token authentication
+
+id: github
+name: GitHub
+display_name: GitHub
+description: Manage repositories, issues, and pull requests on GitHub
+long_description: |
+  Connect your GitHub account to create issues, pull requests, manage
+  repositories, and automate development workflows. Supports both
+  OAuth 2.0 and Personal Access Token authentication.
+
+category: developer_tools
+tags:
+  - git
+  - code
+  - repository
+  - issues
+  - pull-requests
+  - developer
+
+icon_url: /icons/github.svg
+color: "#24292e"
+
+# Authentication - OAuth2 or Personal Access Token
+auth:
+  type: oauth2
+  oauth:
+    provider: github
+    scopes:
+      - repo
+      - read:user
+      - user:email
+  fields:
+    - name: personal_access_token
+      label: Personal Access Token (Alternative)
+      type: password
+      required: false
+      help: |
+        If not using OAuth, you can provide a Personal Access Token:
+        1. Go to https://github.com/settings/tokens
+        2. Click "Generate new token (classic)"
+        3. Select required scopes (repo, read:user)
+        4. Copy and paste the token here
+
+# Actions
+actions:
+  create_issue:
+    name: create_issue
+    display_name: Create Issue
+    description: Create a new issue in a repository
+    type: http
+
+    method: POST
+    url: "https://api.github.com/repos/{{parameters.owner}}/{{parameters.repo}}/issues"
+    headers:
+      Authorization: "Bearer {{auth.personal_access_token}}"
+      Accept: "application/vnd.github+json"
+      Content-Type: "application/json"
+    body:
+      title: "{{parameters.title}}"
+      body: "{{parameters.body}}"
+
+    parameters:
+      - name: owner
+        label: Repository Owner
+        type: string
+        required: true
+        description: GitHub username or organization
+      - name: repo
+        label: Repository Name
+        type: string
+        required: true
+      - name: title
+        label: Issue Title
+        type: string
+        required: true
+      - name: body
+        label: Issue Body
+        type: string
+        required: false
+        description: Markdown-formatted issue body
+
+    response:
+      mappings:
+        issue_number: "$.number"
+        url: "$.html_url"
+        id: "$.id"
+
+  create_pr:
+    name: create_pr
+    display_name: Create Pull Request
+    description: Create a new pull request
+    type: http
+
+    method: POST
+    url: "https://api.github.com/repos/{{parameters.owner}}/{{parameters.repo}}/pulls"
+    headers:
+      Authorization: "Bearer {{auth.personal_access_token}}"
+      Accept: "application/vnd.github+json"
+      Content-Type: "application/json"
+    body:
+      title: "{{parameters.title}}"
+      body: "{{parameters.body}}"
+      head: "{{parameters.head}}"
+      base: "{{parameters.base}}"
+
+    parameters:
+      - name: owner
+        label: Repository Owner
+        type: string
+        required: true
+      - name: repo
+        label: Repository Name
+        type: string
+        required: true
+      - name: title
+        label: PR Title
+        type: string
+        required: true
+      - name: head
+        label: Head Branch
+        type: string
+        required: true
+        description: The branch with your changes
+      - name: base
+        label: Base Branch
+        type: string
+        required: true
+        description: The branch you want to merge into (e.g., main)
+      - name: body
+        label: PR Body
+        type: string
+        required: false
+
+    response:
+      mappings:
+        pr_number: "$.number"
+        url: "$.html_url"
+
+  add_comment:
+    name: add_comment
+    display_name: Add Comment
+    description: Add a comment to an issue or pull request
+    type: http
+
+    method: POST
+    url: "https://api.github.com/repos/{{parameters.owner}}/{{parameters.repo}}/issues/{{parameters.issue_number}}/comments"
+    headers:
+      Authorization: "Bearer {{auth.personal_access_token}}"
+      Accept: "application/vnd.github+json"
+      Content-Type: "application/json"
+    body:
+      body: "{{parameters.body}}"
+
+    parameters:
+      - name: owner
+        label: Repository Owner
+        type: string
+        required: true
+      - name: repo
+        label: Repository Name
+        type: string
+        required: true
+      - name: issue_number
+        label: Issue/PR Number
+        type: integer
+        required: true
+      - name: body
+        label: Comment Body
+        type: string
+        required: true
+
+    response:
+      mappings:
+        id: "$.id"
+        url: "$.html_url"
+
+  test_connection:
+    name: test_connection
+    display_name: Test Connection
+    description: Verify GitHub credentials
+    type: http
+
+    method: GET
+    url: "https://api.github.com/user"
+    headers:
+      Authorization: "Bearer {{auth.personal_access_token}}"
+      Accept: "application/vnd.github+json"
+
+    parameters: []
+
+    response:
+      mappings:
+        login: "$.login"
+        name: "$.name"
+
+# Metadata
+version: "1.0.0"
+documentation_url: https://docs.github.com/en/rest
+homepage_url: https://github.com
+is_enabled: true
+supports_test_connection: true
