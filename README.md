@@ -1,5 +1,6 @@
 # Orchestly
 
+[![CI](https://github.com/orchestly-ai/platform/actions/workflows/ci.yml/badge.svg)](https://github.com/orchestly-ai/platform/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/orchestly-ai/platform)](https://github.com/orchestly-ai/platform)
 
@@ -135,6 +136,10 @@ Run tests:
 ```bash
 USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true PYTHONPATH=. python -m pytest backend/tests/
 ```
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for what's coming next.
 
 ## Contributing
 
