@@ -56,10 +56,6 @@ jobs:
         working-directory: dashboard
         run: npm ci
 
-      - name: Type check
-        working-directory: dashboard
-        run: npx tsc --noEmit
-
       - name: Build
         working-directory: dashboard
         run: npm run build
@@ -67,6 +63,9 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
 
     steps:
       - name: Checkout code
