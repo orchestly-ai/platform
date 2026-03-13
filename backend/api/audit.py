@@ -347,7 +347,7 @@ async def generate_audit_report(
     - Last 7 days: GET /audit/report?start_time=2025-01-10T00:00:00Z&end_time=2025-01-17T00:00:00Z
     - Last month: GET /audit/report?start_time=2024-12-01T00:00:00Z&end_time=2025-01-01T00:00:00Z
     """
-    await enforce_feature("audit_logs", "default", db)
+    await enforce_feature("advanced_audit", "default", db)
 
     if end_time < start_time:
         raise HTTPException(status_code=400, detail="end_time must be after start_time")
@@ -422,7 +422,7 @@ async def export_audit_events_csv(
 
     Returns a CSV file download.
     """
-    await enforce_feature("audit_logs", "default", db)
+    await enforce_feature("advanced_audit", "default", db)
 
     if end_time < start_time:
         raise HTTPException(status_code=400, detail="end_time must be after start_time")

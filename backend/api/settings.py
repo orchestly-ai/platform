@@ -368,14 +368,24 @@ async def get_organization(
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
 
+    # Merge enterprise features when license is active
+    features = list(org.enabled_features or [])
+    try:
+        from ee.license import has_enterprise_license
+        if has_enterprise_license():
+            from backend.shared.rbac_models import ENTERPRISE_FEATURES
+            features = list(set(features) | set(ENTERPRISE_FEATURES))
+    except ImportError:
+        pass
+
     return {
         "id": org.organization_id,
         "name": org.name,
         "slug": org.slug,
-        "plan": org.plan,
+        "plan": org.plan if not (features and 'sso_saml' in features) else "enterprise",
         "max_users": org.max_users,
         "max_agents": org.max_agents,
-        "enabled_features": org.enabled_features or [],
+        "enabled_features": features,
         "settings": org.settings,
     }
 

@@ -22,6 +22,44 @@ Orchestly lets you register, route, monitor, and govern AI agents across your or
 - **Integrations Marketplace** — Pre-built connectors for Slack, GitHub, Jira, Salesforce, and 20+ services
 - **Real-time Monitoring** — Live metrics, alerts, and agent health dashboards
 
+## Open-Core Model
+
+Orchestly follows an **open-core** model. The core platform is Apache 2.0 and fully featured for building production AI agent workflows. Enterprise features for compliance, governance, and advanced deployment require a license.
+
+| | Community (Apache 2.0) | Enterprise |
+|---|---|---|
+| Workflow engine & visual designer | ✅ | ✅ |
+| Agent registry & management | ✅ | ✅ |
+| All integrations (400+) | ✅ | ✅ |
+| Smart LLM routing (all providers) | ✅ | ✅ |
+| Cost tracking & budget alerts | ✅ | ✅ |
+| Prompt registry & versioning | ✅ | ✅ |
+| Scheduler (cron/interval) | ✅ | ✅ |
+| RAG, Memory, MCP | ✅ | ✅ |
+| Basic RBAC (admin/member/viewer) | ✅ | ✅ |
+| JWT + API key auth | ✅ | ✅ |
+| Human-in-the-Loop (basic) | ✅ | ✅ |
+| Webhooks & realtime updates | ✅ | ✅ |
+| BYOK (Bring Your Own LLM Keys) | ✅ | ✅ |
+| Marketplace (browse & install) | ✅ | ✅ |
+| Up to 5 users, 50 agents, 100 workflows | ✅ | ✅ |
+| SSO / SAML / OIDC | | ✅ |
+| HIPAA compliance | | ✅ |
+| Advanced audit (export, retention) | | ✅ |
+| Custom RBAC (custom roles) | | ✅ |
+| A/B testing (statistical significance) | | ✅ |
+| Time-travel debugging | | ✅ |
+| ML-based auto-optimization | | ✅ |
+| Multi-cloud deployment | | ✅ |
+| BYOC (customer VPC workers) | | ✅ |
+| White-label & partner program | | ✅ |
+| Advanced analytics & BI | | ✅ |
+| Security scanning | | ✅ |
+| Marketplace (paid publishing) | | ✅ |
+| Unlimited users, agents, workflows | | ✅ |
+
+To activate enterprise features, set `ORCHESTLY_LICENSE_KEY` in your environment. See [`ee/README.md`](ee/README.md) for details.
+
 ## Quick Start
 
 ### Option 1: Run locally (no Docker needed)
@@ -36,7 +74,7 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r backend/requirements.txt
 
 # Start the API (uses SQLite — no Postgres required)
-ADMIN_PASSWORD=admin123 USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true \
+ADMIN_PASSWORD=admin123 USE_SQLITE=true \
   python -m uvicorn backend.api.main:app --reload
 ```
 
@@ -125,7 +163,7 @@ See [`.env.example`](.env.example) for all available configuration options.
 ```bash
 # Backend (from project root)
 python3 -m venv venv && source venv/bin/activate && pip install -r backend/requirements.txt
-USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true python -m uvicorn backend.api.main:app --reload
+USE_SQLITE=true python -m uvicorn backend.api.main:app --reload
 
 # Frontend (separate terminal)
 cd dashboard && npm install && npm run dev
@@ -134,7 +172,7 @@ cd dashboard && npm install && npm run dev
 Run tests:
 
 ```bash
-USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true PYTHONPATH=. python -m pytest backend/tests/
+USE_SQLITE=true PYTHONPATH=. python -m pytest backend/tests/
 ```
 
 ## Roadmap

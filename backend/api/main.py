@@ -874,6 +874,8 @@ async def lifespan(app: FastAPI):
     # Initialize all database tables
     # NOTE: In SQLite mode, session.py registers type adapters so PostgreSQL-
     # specific types (ARRAY, JSONB, INET, UUID) compile to SQLite equivalents.
+    # Ensure core models are imported so Base.metadata knows about their tables.
+    import backend.database.models  # noqa: F401 — registers AgentModel, TaskModel, etc.
     from backend.database.session import init_db
     await init_db()
     print("   Database: Tables initialized")
@@ -1386,14 +1388,6 @@ app.include_router(auth_router)
 from backend.api.llm import router as llm_router
 app.include_router(llm_router)
 
-# Include HIPAA compliance router (Business Associate role)
-try:
-    from backend.api.hipaa import router as hipaa_router
-    app.include_router(hipaa_router)
-    print("  ✓ HIPAA compliance router enabled")
-except Exception as e:
-    print(f"  ✗ HIPAA compliance router: {e}")
-
 # Include Model Router (intelligent LLM routing with health monitoring)
 from backend.api.router import router as model_router
 app.include_router(model_router)
@@ -1449,174 +1443,100 @@ except Exception as e:
     print(f"  ✗ Webhooks router: {e}")
     print(f"    Traceback: {traceback.format_exc()}")
 
-# NOTE: Extended routers (A/B testing, HITL, Cost, Audit) now work in SQLite mode
-# thanks to SQLite-compatible migrations (20260102_0001_sqlite_compat.py)
-import os
-_use_sqlite = os.environ.get("USE_SQLITE", "").lower() in ("true", "1", "yes")
-_enable_extended = os.environ.get("ENABLE_EXTENDED_ROUTERS", "").lower() in ("true", "1", "yes")
+# ============================================================================
+# Free-Tier Routers (Apache 2.0 — always loaded)
+# ============================================================================
+# These routers constitute the open-core free tier. They are always available
+# regardless of license status or environment flags.
 
-# Enable extended routers - they now work with SQLite too
-if _enable_extended or _use_sqlite:
-    print("  Enabling extended routers...")
-    try:
-        from backend.api.ab_testing import router as ab_testing_router
-        app.include_router(ab_testing_router)
-        print("    ✓ A/B Testing router enabled")
-    except Exception as e:
-        print(f"    ✗ A/B Testing router: {e}")
+print("  Loading free-tier routers...")
 
-    try:
-        from backend.api.hitl import router as hitl_router
-        app.include_router(hitl_router)
-        print("    ✓ HITL router enabled")
-    except Exception as e:
-        print(f"    ✗ HITL router: {e}")
+_free_routers = [
+    ("backend.api.hitl", "HITL"),
+    ("backend.api.cost", "Cost Tracking"),
+    ("backend.api.audit", "Audit Logs"),
+    ("backend.api.settings", "Settings & Team"),
+    ("backend.api.marketplace", "Marketplace"),
+    ("backend.api.integrations", "Integrations"),
+    ("backend.api.seed", "Seed Data"),
+    ("backend.api.scheduler", "Scheduler"),
+    ("backend.api.memory", "Memory (BYOS)"),
+    ("backend.api.rag", "RAG (BYOD)"),
+    ("backend.api.mcp", "MCP"),
+    ("backend.api.prompts", "Prompt Registry"),
+    ("backend.api.llm_billing", "LLM Billing"),
+    ("backend.api.credentials", "Credentials (BYOK)"),
+    ("backend.api.supervisor", "Supervisor"),
+    ("backend.api.realtime", "Realtime (WebSocket)"),
+]
 
+for _module_path, _label in _free_routers:
     try:
-        from backend.api.cost import router as cost_router
-        app.include_router(cost_router)
-        print("    ✓ Cost router enabled")
-    except Exception as e:
-        print(f"    ✗ Cost router: {e}")
+        import importlib as _il
+        _mod = _il.import_module(_module_path)
+        app.include_router(_mod.router)
+        print(f"    ✓ {_label} router enabled")
+    except Exception as _e:
+        print(f"    ✗ {_label} router: {_e}")
 
-    try:
-        from backend.api.audit import router as audit_router
-        app.include_router(audit_router)
-        print("    ✓ Audit router enabled")
-    except Exception as e:
-        print(f"    ✗ Audit router: {e}")
+# ============================================================================
+# Enterprise Routers (require ORCHESTLY_LICENSE_KEY)
+# ============================================================================
+# These routers provide enterprise-grade features gated behind a license.
+# Without a valid license key, these endpoints are not registered at all.
 
-    # Add settings router for team members and API keys
-    try:
-        from backend.api.settings import router as settings_router
-        app.include_router(settings_router)
-        print("    ✓ Settings router enabled")
-    except Exception as e:
-        print(f"    ✗ Settings router: {e}")
+try:
+    from ee.license import has_enterprise_license as _has_ee_license
+except ImportError:
+    def _has_ee_license() -> bool:
+        return False
 
-    # Add marketplace router for agent marketplace
-    try:
-        from backend.api.marketplace import router as marketplace_router
-        app.include_router(marketplace_router)
-        print("    ✓ Marketplace router enabled")
-    except Exception as e:
-        import traceback
-        print(f"    ✗ Marketplace router: {e}")
-        print(f"       Traceback: {traceback.format_exc()}")
+if _has_ee_license():
+    print("  Loading enterprise routers (license active)...")
 
-    # Add integrations router for integration marketplace
-    try:
-        from backend.api.integrations import router as integrations_router
-        app.include_router(integrations_router)
-        print("    ✓ Integrations router enabled")
-    except Exception as e:
-        print(f"    ✗ Integrations router: {e}")
+    _enterprise_routers = [
+        ("backend.api.sso", "SSO (SAML/OAuth)"),
+        ("backend.api.hipaa", "HIPAA Compliance"),
+        ("backend.api.multicloud", "Multi-Cloud Deployment"),
+        ("backend.api.partners", "Partners (White Label)"),
+        ("backend.api.ab_testing", "A/B Testing"),
+        ("backend.api.timetravel", "Time-Travel Debugging"),
+        ("backend.api.optimization", "Auto-Optimization"),
+        ("backend.api.ml_routing", "ML Routing"),
+        ("backend.api.analytics", "Advanced Analytics"),
+        ("backend.api.byoc", "BYOC (Bring Your Own Compute)"),
+        # NOTE: backend.api.security is excluded — its security_models.UserRole
+        # conflicts with rbac_models' user_roles table, poisoning the mapper.
+        # Re-add once security_models uses a separate table name or extend_existing.
+    ]
 
-    # Add seed data router (for development)
-    try:
-        from backend.api.seed import router as seed_router
-        app.include_router(seed_router)
-        print("    ✓ Seed data router enabled")
-    except Exception as e:
-        print(f"    ✗ Seed data router: {e}")
-
-    # Add scheduler router
-    try:
-        from backend.api.scheduler import router as scheduler_router
-        app.include_router(scheduler_router)
-        print("    ✓ Scheduler router enabled")
-    except Exception as e:
-        print(f"    ✗ Scheduler router: {e}")
-
-    # Add memory router (BYOS - Bring Your Own Storage)
-    try:
-        from backend.api.memory import router as memory_router
-        app.include_router(memory_router)
-        print("    ✓ Memory router enabled (BYOS)")
-    except Exception as e:
-        print(f"    ✗ Memory router: {e}")
-
-    # Add RAG router (BYOD - Bring Your Own Data)
-    try:
-        from backend.api.rag import router as rag_router
-        app.include_router(rag_router)
-        print("    ✓ RAG router enabled (BYOD)")
-    except Exception as e:
-        print(f"    ✗ RAG router: {e}")
-
-    # Add BYOC router (Bring Your Own Compute)
-    try:
-        from backend.api.byoc import router as byoc_router
-        app.include_router(byoc_router)
-        print("    ✓ BYOC router enabled (Bring Your Own Compute)")
-    except Exception as e:
-        print(f"    ✗ BYOC router: {e}")
-
-    # Add MCP router (Model Context Protocol)
-    try:
-        from backend.api.mcp import router as mcp_router
-        app.include_router(mcp_router)
-        print("    ✓ MCP router enabled (Model Context Protocol)")
-    except Exception as e:
-        print(f"    ✗ MCP router: {e}")
-
-    # Add Prompt Registry router
-    try:
-        from backend.api.prompts import router as prompts_router
-        app.include_router(prompts_router)
-        print("    ✓ Prompt Registry router enabled")
-    except Exception as e:
-        print(f"    ✗ Prompt Registry router: {e}")
-
-    # Add Auto-Optimization Engine router
-    try:
-        from backend.api.optimization import router as optimization_router
-        app.include_router(optimization_router)
-        print("    ✓ Auto-Optimization Engine router enabled")
-    except Exception as e:
-        print(f"    ✗ Auto-Optimization Engine router: {e}")
-
-    # Add LLM Billing router (customer billing, BYOK keys, usage tracking)
-    try:
-        from backend.api.llm_billing import router as llm_billing_router
-        app.include_router(llm_billing_router)
-        print("    ✓ LLM Billing router enabled")
-    except Exception as e:
-        print(f"    ✗ LLM Billing router: {e}")
-
-    # Add Credentials router (BYOK LLM API key management per tenant)
-    try:
-        from backend.api.credentials import router as credentials_router
-        app.include_router(credentials_router)
-        print("    ✓ Credentials router enabled (BYOK LLM keys)")
-    except Exception as e:
-        print(f"    ✗ Credentials router: {e}")
-
-    # Add SSO router (SAML/OAuth enterprise authentication)
-    try:
-        from backend.api.sso import router as sso_router
-        app.include_router(sso_router)
-        print("    ✓ SSO router enabled (SAML/OAuth)")
-    except Exception as e:
-        print(f"    ✗ SSO router: {e}")
-
-    # Add Multi-Cloud Deployment router
-    try:
-        from backend.api.multicloud import router as multicloud_router
-        app.include_router(multicloud_router)
-        print("    ✓ Multicloud router enabled")
-    except Exception as e:
-        print(f"    ✗ Multicloud router: {e}")
-
-    # Add Partners / White Label router
-    try:
-        from backend.api.partners import router as partners_router
-        app.include_router(partners_router)
-        print("    ✓ Partners router enabled (White Label)")
-    except Exception as e:
-        print(f"    ✗ Partners router: {e}")
+    for _module_path, _label in _enterprise_routers:
+        try:
+            import importlib as _il
+            _mod = _il.import_module(_module_path)
+            app.include_router(_mod.router)
+            print(f"    ✓ {_label} router enabled")
+        except Exception as _e:
+            print(f"    ✗ {_label} router: {_e}")
 else:
-    print("  ℹ Extended routers disabled (set ENABLE_EXTENDED_ROUTERS=true to enable)")
+    print("  ℹ Enterprise routers not loaded (set ORCHESTLY_LICENSE_KEY to activate)")
+
+# ============================================================================
+# License Status Endpoint
+# ============================================================================
+
+@app.get("/api/v1/license/status")
+async def license_status():
+    """Return the current license edition and activation status."""
+    try:
+        from ee.license import get_license_status
+        return get_license_status()
+    except ImportError:
+        return {
+            "edition": "community",
+            "licensed": False,
+            "message": "Enterprise module not installed.",
+        }
 
 
 # ============================================================================

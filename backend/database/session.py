@@ -99,7 +99,24 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 async def init_db():
     """Initialize database tables."""
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        if USE_SQLITE:
+            # SQLite + create_all can fail on duplicate indexes when the DB
+            # already exists but new models with explicit Index() are loaded.
+            # A single create_all may abort mid-way, leaving some tables uncreated.
+            # Retry up to 3 times so that tables created before the error on pass N
+            # are skipped on pass N+1, allowing later tables to be created.
+            from sqlalchemy.exc import OperationalError
+            for _attempt in range(3):
+                try:
+                    await conn.run_sync(Base.metadata.create_all)
+                    break  # All tables created successfully
+                except OperationalError as e:
+                    if "already exists" in str(e):
+                        continue  # Retry — next pass skips existing tables
+                    else:
+                        raise
+        else:
+            await conn.run_sync(Base.metadata.create_all)
 
 
 async def close_db():

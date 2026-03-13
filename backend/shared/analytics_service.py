@@ -25,13 +25,15 @@ def _json_array_contains(column, value: str):
     Create a database-agnostic JSON array contains condition.
 
     Works with both PostgreSQL (JSONB) and SQLite (JSON).
-    For PostgreSQL: Uses @> operator
-    For SQLite: Uses json_each to check if value exists in array
+    Uses instr() with JSON-serialized value as a portable approximation.
     """
-    # Use raw SQL that works for PostgreSQL's JSONB
-    # Cast parameter to jsonb for @> operator
-    return text(f"({column.key} @> (:json_val)::jsonb OR {column.key} IS NULL)").bindparams(
-        json_val=json.dumps([value])
+    # Use instr() which works on both PostgreSQL and SQLite
+    # Check if the JSON-serialized value appears in the column text
+    return or_(
+        text(f"instr({column.key}, :json_val) > 0").bindparams(
+            json_val=json.dumps(value)
+        ),
+        text(f"{column.key} IS NULL")
     )
 
 from backend.shared.analytics_models import (
@@ -116,10 +118,10 @@ class AnalyticsService:
     ) -> Optional[Dashboard]:
         """Get dashboard by ID with access control."""
         # Build the JSON contains condition for shared_with_users
-        # Cast parameter to jsonb for @> operator (column is already JSONB)
+        # Use instr() which works on both PostgreSQL and SQLite
         shared_with_condition = text(
-            "(shared_with_users @> (:user_json)::jsonb OR shared_with_users IS NULL)"
-        ).bindparams(user_json=json.dumps([user_id]))
+            "(instr(shared_with_users, :user_json) > 0 OR shared_with_users IS NULL)"
+        ).bindparams(user_json=json.dumps(user_id))
 
         stmt = select(Dashboard).where(
             and_(
@@ -155,7 +157,7 @@ class AnalyticsService:
             or_(
                 Dashboard.created_by == user_id,
                 Dashboard.is_public == True,
-                Dashboard.shared_with_users.op('@>')(func.cast([user_id], JSONB))
+                _json_array_contains(Dashboard.shared_with_users, user_id)
             )
         )
 

@@ -15,6 +15,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/services/api'
 import type { ExecutionStep } from '@/types/llm'
 import { WorkflowVisualization } from '@/components/WorkflowVisualization'
+import { UpgradeBanner } from '@/components/UpgradeBanner'
 import {
   Bug,
   Activity,
@@ -33,6 +34,7 @@ import {
   Sparkles,
   GitBranch,
   Loader2,
+  Lock,
 } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -58,6 +60,14 @@ export function TimeTravelDebuggerPage() {
     queryKey: ['executions'],
     queryFn: () => api.getExecutions(),
   })
+
+  // Check if advanced time-travel features require enterprise license
+  const { data: orgPlan } = useQuery({
+    queryKey: ['orgPlan'],
+    queryFn: () => api.getOrgPlan(),
+    staleTime: 60_000,
+  })
+  const isAdvancedGated = orgPlan && !orgPlan.enabled_features.includes('time_travel')
 
   // Fetch workflow definition for selected execution
   const selectedExecution = executions?.find((e) => e.id === selectedExecutionId)
@@ -375,6 +385,7 @@ export function TimeTravelDebuggerPage() {
             </p>
           </div>
         </div>
+        {isAdvancedGated && <UpgradeBanner feature="Advanced Time-Travel Debugging (comparisons, replay, analysis)" />}
       </div>
 
       {/* Main Content - Split View */}
@@ -467,18 +478,23 @@ export function TimeTravelDebuggerPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={toggleCompare}
+                    disabled={!!isAdvancedGated}
+                    title={isAdvancedGated ? 'Requires Enterprise license' : undefined}
                     className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
-                      compareMode ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    } border`}
+                      isAdvancedGated ? 'bg-gray-50 text-gray-400 cursor-not-allowed border' :
+                      compareMode ? 'bg-purple-50 text-purple-600 border-purple-200 border' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border'
+                    }`}
                   >
+                    {isAdvancedGated && <Lock size={12} className="inline mr-1" />}
                     Compare States
                   </button>
                   <button
                     onClick={replay}
-                    disabled={isReplaying}
+                    disabled={isReplaying || !!isAdvancedGated}
+                    title={isAdvancedGated ? 'Requires Enterprise license' : undefined}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 border rounded transition-colors disabled:opacity-50"
                   >
-                    <RotateCcw size={14} />
+                    {isAdvancedGated ? <Lock size={14} /> : <RotateCcw size={14} />}
                     Replay
                   </button>
                   <button
@@ -613,16 +629,20 @@ export function TimeTravelDebuggerPage() {
                     <div className="flex gap-2 mt-3">
                       <button
                         onClick={replayFromHere}
-                        disabled={isReplaying || currentStep === executionSteps.length - 1}
+                        disabled={isReplaying || currentStep === executionSteps.length - 1 || !!isAdvancedGated}
+                        title={isAdvancedGated ? 'Requires Enterprise license' : undefined}
                         className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition-colors text-sm font-medium"
                       >
-                        <Play size={14} />
+                        {isAdvancedGated ? <Lock size={14} /> : <Play size={14} />}
                         Replay from here
                       </button>
                       <button
                         onClick={openModifyModal}
-                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors text-sm font-medium"
+                        disabled={!!isAdvancedGated}
+                        title={isAdvancedGated ? 'Requires Enterprise license' : undefined}
+                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
+                        {isAdvancedGated && <Lock size={12} className="inline mr-1" />}
                         Modify & Retry
                       </button>
                     </div>

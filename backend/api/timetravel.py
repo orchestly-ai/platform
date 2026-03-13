@@ -31,6 +31,7 @@ from backend.shared.timetravel_models import (
     ExecutionComparisonModel, ExecutionReplayModel
 )
 from backend.shared.auth_utils import get_current_organization
+from backend.shared.plan_enforcement import enforce_feature
 from sqlalchemy import select, and_, desc
 
 
@@ -357,6 +358,8 @@ async def create_comparison(
     - Root cause analysis
     - Recommendations
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     comparison_engine = ComparisonEngine(db)
 
     comparison = await comparison_engine.compare_executions(
@@ -394,6 +397,8 @@ async def get_comparison(
     organization_id: str = Depends(get_current_organization)
 ):
     """Get details of existing comparison."""
+    await enforce_feature("time_travel", organization_id, db)
+
     stmt = select(ExecutionComparisonModel).where(
         and_(
             ExecutionComparisonModel.comparison_id == comparison_id,
@@ -422,6 +427,8 @@ async def list_comparisons(
     organization_id: str = Depends(get_current_organization)
 ):
     """List all comparisons for the organization."""
+    await enforce_feature("time_travel", organization_id, db)
+
     stmt = select(ExecutionComparisonModel).where(
         ExecutionComparisonModel.organization_id == organization_id
     ).order_by(desc(ExecutionComparisonModel.created_at)).limit(limit).offset(offset)
@@ -456,6 +463,8 @@ async def create_replay(
     - step_by_step: Pause after each node
     - breakpoint: Pause at specified nodes
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     replay_engine = ReplayEngine(db)
 
     replay_id = await replay_engine.create_replay(
@@ -495,6 +504,8 @@ async def execute_replay(
     This starts a new workflow execution based on the replay configuration.
     Returns the new execution ID.
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     # Verify access
     stmt = select(ExecutionReplayModel).where(
         and_(
@@ -537,6 +548,8 @@ async def get_replay(
     organization_id: str = Depends(get_current_organization)
 ):
     """Get replay details and status."""
+    await enforce_feature("time_travel", organization_id, db)
+
     stmt = select(ExecutionReplayModel).where(
         and_(
             ExecutionReplayModel.replay_id == replay_id,
@@ -566,6 +579,8 @@ async def list_replays(
     organization_id: str = Depends(get_current_organization)
 ):
     """List all replays for the organization."""
+    await enforce_feature("time_travel", organization_id, db)
+
     query = select(ExecutionReplayModel).where(
         ExecutionReplayModel.organization_id == organization_id
     )
@@ -601,6 +616,8 @@ async def get_execution_bottlenecks(
 
     Returns nodes that took more than threshold_percentage of total execution time.
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     timeline_service = TimelineBuilderService(db)
 
     timeline = await timeline_service.get_timeline(execution_id)
@@ -642,6 +659,8 @@ async def get_execution_decision_points(
 
     Shows which branches were taken at if/switch nodes.
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     timeline_service = TimelineBuilderService(db)
 
     timeline = await timeline_service.get_timeline(execution_id)
@@ -680,6 +699,8 @@ async def get_llm_calls_summary(
 
     Shows models used, tokens, costs for each LLM call.
     """
+    await enforce_feature("time_travel", organization_id, db)
+
     # Fetch LLM call snapshots
     stmt = select(ExecutionSnapshotModel).where(
         and_(

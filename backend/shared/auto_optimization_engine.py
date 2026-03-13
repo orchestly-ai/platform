@@ -19,7 +19,7 @@ from uuid import UUID
 from enum import Enum
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, desc
+from sqlalchemy import select, func, and_, desc, case
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ class AutoOptimizationEngine:
                 func.avg(WorkflowExecutionModel.total_cost).label('avg_cost'),
                 func.avg(WorkflowExecutionModel.total_tokens).label('avg_tokens'),
                 func.sum(
-                    func.case(
+                    case(
                         (WorkflowExecutionModel.status == 'completed', 1),
                         else_=0
                     )

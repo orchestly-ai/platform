@@ -406,21 +406,30 @@ SYSTEM_ROLES = {
 
 # Plan-based limits
 PLAN_LIMITS = {
-    "community":  {"max_users": 1, "max_agents": 5, "max_workflows": 10},
-    "starter":    {"max_users": 3, "max_agents": 20, "max_workflows": 50},
-    "pro":        {"max_users": 10, "max_agents": 100, "max_workflows": 500},
+    "community":  {"max_users": 5, "max_agents": 50, "max_workflows": 100},
+    "starter":    {"max_users": 10, "max_agents": 100, "max_workflows": 500},
+    "pro":        {"max_users": 50, "max_agents": 500, "max_workflows": 2000},
     "enterprise": {"max_users": 9999, "max_agents": 9999, "max_workflows": 9999},
 }
 
-PAID_FEATURES = [
-    "team_management",
-    "custom_rbac",
+ENTERPRISE_FEATURES = [
     "sso_saml",
-    "ab_testing",
-    "audit_logs",
-    "white_label",
+    "hipaa_compliance",
+    "advanced_audit",
+    "byoc",
     "multi_cloud",
-    "hitl_approvals",
-    "advanced_routing",
-    "api_keys",
+    "white_label",
+    "ab_testing",
+    "time_travel",
+    "advanced_supervisor",
+    "ml_optimization",
+    "cost_forecasting",
+    "advanced_hitl",
+    "custom_rbac",
+    "advanced_analytics",
+    "security_scanning",
+    "marketplace_publishing",
 ]
+
+# Backwards compatibility alias
+PAID_FEATURES = ENTERPRISE_FEATURES

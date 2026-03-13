@@ -5,6 +5,7 @@ FastAPI dependencies for enforcing free/paid tier limits:
 - User count limits per organization plan
 - Agent count limits per organization plan
 - Feature gating for paid-only features
+- Enterprise license gating for enterprise-only features
 """
 
 import logging
@@ -15,7 +16,16 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database.session import get_db
-from backend.shared.rbac_models import OrganizationModel, UserModel, PAID_FEATURES
+from backend.shared.rbac_models import OrganizationModel, UserModel, PAID_FEATURES, ENTERPRISE_FEATURES
+
+# Import enterprise license check with graceful fallback
+# When the ee/ package is not present (e.g. Apache-only distribution),
+# enterprise features are simply disabled.
+try:
+    from ee.license import has_enterprise_license
+except ImportError:
+    def has_enterprise_license() -> bool:
+        return False
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +111,11 @@ async def enforce_agent_limit(org_id: str, db: AsyncSession) -> None:
 
 async def enforce_feature(feature_name: str, org_id: str, db: AsyncSession) -> None:
     """
-    Raise 403 if the requested feature is not enabled for the organization.
+    Raise 403 if the requested feature is not enabled.
+
+    Logic:
+    - If the feature is NOT in ENTERPRISE_FEATURES, it's free — always allow.
+    - If the feature IS in ENTERPRISE_FEATURES, check the enterprise license.
 
     Usage in routes:
         @router.get("/team")
@@ -109,16 +123,45 @@ async def enforce_feature(feature_name: str, org_id: str, db: AsyncSession) -> N
             await enforce_feature("team_management", org_id, db)
             ...
     """
-    org = await _get_org(org_id, db)
-    enabled = org.enabled_features or []
+    # Free features are always available
+    if feature_name not in ENTERPRISE_FEATURES:
+        return
 
-    if feature_name not in enabled:
+    # Enterprise features require an active license
+    if not has_enterprise_license():
         raise HTTPException(
             status_code=403,
             detail={
-                "error": "feature_not_available",
-                "message": f"The '{feature_name}' feature requires a paid plan. Upgrade to unlock it.",
+                "error": "enterprise_required",
+                "message": f"The '{feature_name}' feature requires an Orchestly Enterprise license.",
                 "feature": feature_name,
-                "plan": org.plan,
+            },
+        )
+
+
+def enforce_enterprise_feature(feature_name: str) -> None:
+    """
+    Raise 403 if the enterprise license is not active.
+
+    This is a synchronous, non-DB check — it only verifies that the
+    ORCHESTLY_LICENSE_KEY environment variable contains a valid key.
+
+    Usage in routes:
+        @router.get("/sso/config")
+        async def get_sso_config(...):
+            enforce_enterprise_feature("sso_saml")
+            ...
+    """
+    if feature_name not in ENTERPRISE_FEATURES:
+        logger.warning("enforce_enterprise_feature called with unknown feature: %s", feature_name)
+
+    if not has_enterprise_license():
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": "enterprise_required",
+                "message": f"The '{feature_name}' feature requires an Orchestly Enterprise license. "
+                           "Set ORCHESTLY_LICENSE_KEY to activate enterprise features.",
+                "feature": feature_name,
             },
         )

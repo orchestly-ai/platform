@@ -745,6 +745,14 @@ export function ABTestingPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['experiments'] }),
   })
 
+  // Check if feature is gated (must be before any early return to satisfy Rules of Hooks)
+  const { data: orgPlan } = useQuery({
+    queryKey: ['orgPlan'],
+    queryFn: () => api.getOrgPlan(),
+    staleTime: 60_000,
+  })
+  const isFeatureGated = orgPlan && !orgPlan.enabled_features.includes('ab_testing')
+
   const handleDuplicate = (id: string) => {
     // Would duplicate the experiment configuration
     console.log('Duplicating experiment:', id)
@@ -780,14 +788,6 @@ export function ABTestingPage() {
     { id: 'completed', label: 'Completed', count: stats.completed },
     { id: 'draft', label: 'Draft', count: stats.draft },
   ]
-
-  // Check if feature is gated
-  const { data: orgPlan } = useQuery({
-    queryKey: ['orgPlan'],
-    queryFn: () => api.getOrgPlan(),
-    staleTime: 60_000,
-  })
-  const isFeatureGated = orgPlan && !orgPlan.enabled_features.includes('ab_testing')
 
   return (
     <div className="space-y-6">

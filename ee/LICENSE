@@ -1,0 +1,29 @@
+Orchestly Enterprise Edition License
+
+Copyright (c) 2025-present Orchestly, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software for evaluation, testing, and development purposes.
+
+PRODUCTION USE of the Enterprise Edition features requires a valid enterprise
+license key obtained from Orchestly, Inc.
+
+You may NOT:
+  1. Use the Enterprise Edition features in production without a valid license
+  2. Offer the Software as a competing managed service (SaaS)
+  3. Remove or alter any license checks or enterprise feature gates
+  4. Redistribute the Enterprise Edition as part of a commercial product
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+For licensing inquiries, contact: enterprise@orchestly.ai

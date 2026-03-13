@@ -227,7 +227,7 @@ export function AuditLogsPage() {
     queryFn: () => api.getOrgPlan(),
     staleTime: 60_000,
   })
-  const isFeatureGated = orgPlan && !orgPlan.enabled_features.includes('audit_logs')
+  const isAdvancedAuditGated = orgPlan && !orgPlan.enabled_features.includes('advanced_audit')
 
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['auditLogs', actionFilter, userFilter, timeRange],
@@ -316,7 +316,7 @@ export function AuditLogsPage() {
 
   return (
     <div className="space-y-6">
-      {isFeatureGated && <UpgradeBanner feature="Audit Logs" />}
+      {isAdvancedAuditGated && <UpgradeBanner feature="Advanced Audit (export, reports, retention)" />}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -354,7 +354,8 @@ export function AuditLogsPage() {
               </select>
               <button
                 onClick={handleExport}
-                disabled={isExporting || !filteredLogs?.length}
+                disabled={isExporting || !filteredLogs?.length || !!isAdvancedAuditGated}
+                title={isAdvancedAuditGated ? 'Requires Enterprise license' : undefined}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors border-l border-gray-200 disabled:opacity-50"
               >
                 <Download className="h-4 w-4" />

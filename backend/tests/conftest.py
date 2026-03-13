@@ -16,6 +16,9 @@ _project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+# Set enterprise license key for testing so enterprise routers are available
+os.environ.setdefault("ORCHESTLY_LICENSE_KEY", "orch_ent_test")
+
 # Create mock numpy to prevent import errors in tests that don't actually need it
 # This allows test collection to succeed even without numpy installed
 if 'numpy' not in sys.modules:
