@@ -10,6 +10,42 @@
 
 Orchestly lets you register, route, monitor, and govern AI agents across your organization. Connect any LLM, build multi-step workflows, and ship reliable AI applications — all from a single dashboard.
 
+## Dashboard Preview
+
+<p align="center">
+  <img src="docs/images/dashboard-overview.png" alt="Orchestly Dashboard Overview" width="100%" />
+</p>
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+<br>
+
+**Workflow Designer** — Visual drag-and-drop workflow builder with triggers, conditions, and integrations
+
+<p align="center">
+  <img src="docs/images/workflow-designer.png" alt="Workflow Designer" width="100%" />
+</p>
+
+**Integrations** — Connect 20+ services including OpenAI, Anthropic, Slack, GitHub, and more
+
+<p align="center">
+  <img src="docs/images/integrations.png" alt="Integrations" width="100%" />
+</p>
+
+**Agent Marketplace** — Discover and install pre-built agents and workflow templates
+
+<p align="center">
+  <img src="docs/images/marketplace.png" alt="Agent Marketplace" width="100%" />
+</p>
+
+**Usage & Cost Tracking** — Monitor token usage and estimate LLM spending across providers
+
+<p align="center">
+  <img src="docs/images/cost-management.png" alt="Cost Management" width="100%" />
+</p>
+
+</details>
+
 ## Features
 
 - **Agent Registry** — Register and manage agents across frameworks (LangChain, CrewAI, AutoGen, custom)
