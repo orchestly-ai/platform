@@ -130,6 +130,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) for the dashboard.
 
+**Populate with demo data** (optional — fills the dashboard with sample workflows, integrations, and agents):
+
+```bash
+./scripts/seed-demo-data.sh
+```
+
 ### Option 2: Docker Compose
 
 ```bash
@@ -140,6 +146,8 @@ docker compose up
 ```
 
 This starts PostgreSQL, Redis, the API at `localhost:8000`, and the dashboard at `localhost:3000`.
+
+Login: `admin@example.com` / `admin123` — then run `./scripts/seed-demo-data.sh` to populate with sample data.
 
 ### Register your first agent
 
