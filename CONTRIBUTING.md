@@ -41,6 +41,40 @@ USE_SQLITE=true ENABLE_EXTENDED_ROUTERS=true python -m pytest backend/tests/ -v
 cd dashboard && npm test
 ```
 
+## Project Structure
+
+```
+orchestly/
+├── backend/               # FastAPI + SQLAlchemy async
+│   ├── api/               # REST API routes & middleware
+│   │   ├── routes/        # Endpoint handlers (agents, workflows, etc.)
+│   │   └── main.py        # App entry point
+│   ├── shared/            # Business logic & services
+│   ├── database/          # Models, migrations, session management
+│   └── tests/             # pytest test suite (1,100+ tests)
+├── dashboard/             # React + Vite + TypeScript frontend
+│   ├── src/
+│   │   ├── pages/         # Page components
+│   │   ├── components/    # Reusable UI components
+│   │   └── services/      # API client
+│   └── package.json
+├── ee/                    # Enterprise features (separate license)
+├── examples/              # Ready-to-run example workflows
+├── docs/                  # Architecture & API documentation
+├── scripts/               # Dev and deployment scripts
+├── docker-compose.yml     # One-command deployment
+└── helm/                  # Kubernetes Helm charts
+```
+
+## Finding Work
+
+New to the project? Here are good ways to get started:
+
+- Browse issues labeled [`good-first-issue`](https://github.com/orchestly-ai/platform/labels/good-first-issue) for beginner-friendly tasks
+- Join the [Discord](https://discord.gg/orchestly) **#contributing** channel to ask questions
+- Check [GitHub Discussions](https://github.com/orchestly-ai/platform/discussions) for open design discussions you can weigh in on
+- Look at the [ROADMAP.md](ROADMAP.md) for upcoming features where help is welcome
+
 ## Pull Request Guidelines
 
 1. **Fork** the repository and create a feature branch from `main`.

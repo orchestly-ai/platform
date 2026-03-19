@@ -3,6 +3,8 @@
 [![CI](https://github.com/orchestly-ai/platform/actions/workflows/ci.yml/badge.svg)](https://github.com/orchestly-ai/platform/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/orchestly-ai/platform)](https://github.com/orchestly-ai/platform)
+[![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord&logoColor=white)](https://discord.gg/orchestly)
+[![GitHub Discussions](https://img.shields.io/github/discussions/orchestly-ai/platform)](https://github.com/orchestly-ai/platform/discussions)
 
 **Open-source orchestration platform for AI agents.**
 
@@ -116,6 +118,48 @@ resp = requests.post("http://localhost:8000/api/v1/agents/register", json={
 print(resp.json())
 ```
 
+## Your First Workflow
+
+Create and execute a simple ticket classifier workflow using the REST API:
+
+```python
+import requests
+
+BASE = "http://localhost:8000/api/v1"
+HEADERS = {"Authorization": "Bearer <your-jwt-token>"}
+
+# 1. Create a workflow
+wf = requests.post(f"{BASE}/workflows", json={
+    "name": "Ticket Classifier",
+    "description": "Classify incoming support tickets by priority",
+    "steps": [
+        {
+            "name": "classify",
+            "type": "llm",
+            "config": {
+                "provider": "openai",
+                "model": "gpt-4o-mini",
+                "prompt": "Classify this support ticket as low, medium, or high priority:\n\n{{input.ticket_text}}"
+            }
+        }
+    ]
+}, headers=HEADERS)
+workflow_id = wf.json()["id"]
+
+# 2. Execute the workflow
+result = requests.post(f"{BASE}/workflows/{workflow_id}/execute", json={
+    "input": {"ticket_text": "My production server is down and customers cannot access the app"}
+}, headers=HEADERS)
+print(result.json())
+```
+
+## Examples
+
+Ready-to-run examples to get you started:
+
+- **[Customer Support Bot](examples/customer-support/)** — Multi-step workflow with agent handoff and human approval
+- **[Programmatic Workflow](examples/create_workflow_programmatically.py)** — Create and execute workflows via the Python API
+
 ## Architecture
 
 ```
@@ -177,7 +221,16 @@ USE_SQLITE=true PYTHONPATH=. python -m pytest backend/tests/
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for what's coming next.
+See [ROADMAP.md](ROADMAP.md) for what's coming next. For past releases, see [CHANGELOG.md](CHANGELOG.md).
+
+## Getting Help
+
+- **[GitHub Discussions](https://github.com/orchestly-ai/platform/discussions)** — Ask questions, share ideas, show what you've built
+- **[Discord](https://discord.gg/orchestly)** — Chat with the community and contributors
+- **[Issues](https://github.com/orchestly-ai/platform/issues)** — Report bugs or request features
+- **Email** — hello@orchestly.ai
+
+For detailed architecture, see [`docs/architecture.md`](docs/architecture.md).
 
 ## Contributing
 
