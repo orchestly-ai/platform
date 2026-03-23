@@ -415,6 +415,85 @@ class GroqClient(BaseLLMClient):
         return (tokens_used / 1000) * cost_per_1k
 
 
+class OpenRouterClient(BaseLLMClient):
+    """OpenRouter API client (OpenAI-compatible, 200+ models)"""
+
+    def _get_default_api_key(self) -> Optional[str]:
+        key = os.getenv("OPENROUTER_API_KEY")
+        return key if key else None  # Treat empty string as None
+
+    async def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: str,
+        max_tokens: int = 1000,
+        temperature: float = 0.7,
+        **kwargs
+    ) -> LLMResponse:
+        """Call OpenRouter API (OpenAI-compatible endpoint)"""
+        try:
+            from openai import AsyncOpenAI
+
+            # OpenRouter uses OpenAI-compatible API
+            client = AsyncOpenAI(
+                api_key=self.api_key,
+                base_url="https://openrouter.ai/api/v1",
+                default_headers={
+                    "HTTP-Referer": "https://orchestly.ai",
+                    "X-Title": "Orchestly",
+                },
+            )
+
+            start_time = time.time()
+            response = await client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                **kwargs
+            )
+            latency_ms = (time.time() - start_time) * 1000
+
+            choice = response.choices[0]
+            tokens_used = response.usage.total_tokens if response.usage else 0
+            cost = self.calculate_cost(model, tokens_used)
+
+            return LLMResponse(
+                content=choice.message.content,
+                model=model,
+                provider="openrouter",
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
+                cost=cost,
+                finish_reason=choice.finish_reason,
+                raw_response=response.model_dump() if hasattr(response, 'model_dump') else None
+            )
+
+        except Exception as e:
+            logger.error(f"OpenRouter API error: {e}")
+            raise
+
+    def calculate_cost(self, model: str, tokens_used: int) -> float:
+        """Calculate OpenRouter cost per 1K tokens"""
+        # Average of input/output pricing per 1K tokens for popular models
+        pricing = {
+            "openai/gpt-4o": 0.00625,  # ($2.50 + $10.00) / 2 per 1M = $6.25/1M
+            "openai/gpt-4o-mini": 0.000375,
+            "openai/gpt-4-turbo": 0.02,
+            "anthropic/claude-3.5-sonnet": 0.009,
+            "anthropic/claude-3-opus": 0.045,
+            "anthropic/claude-3-haiku": 0.00075,
+            "meta-llama/llama-3.1-70b-instruct": 0.000635,
+            "meta-llama/llama-3.1-8b-instruct": 0.000055,
+            "google/gemini-pro-1.5": 0.00625,
+            "google/gemini-flash-1.5": 0.0001875,
+            "mistralai/mistral-large": 0.004,
+        }
+
+        cost_per_1k = pricing.get(model, 0.001)  # Default to $1/1M tokens
+        return (tokens_used / 1000) * cost_per_1k
+
+
 # Provider registry
 _provider_clients = {
     "openai": OpenAIClient,
@@ -422,6 +501,7 @@ _provider_clients = {
     "google": GoogleClient,
     "deepseek": DeepSeekClient,
     "groq": GroqClient,
+    "openrouter": OpenRouterClient,
 }
 
 

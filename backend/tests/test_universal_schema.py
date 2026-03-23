@@ -32,6 +32,7 @@ from backend.shared.provider_adapters import (
     OpenAIAdapter,
     AnthropicAdapter,
     DeepSeekAdapter,
+    OpenRouterAdapter,
     get_adapter,
 )
 
@@ -550,6 +551,119 @@ class TestDeepSeekAdapter:
 
 
 # ============================================================================
+# OpenRouter Adapter Tests
+# ============================================================================
+
+
+class TestOpenRouterAdapter:
+    """Tests for OpenRouter adapter."""
+
+    @pytest.fixture
+    def adapter(self):
+        return OpenRouterAdapter()
+
+    def test_to_provider_format_simple(self, adapter):
+        """Should convert simple request to OpenRouter format with correct model name."""
+        request = UniversalRequest(
+            messages=[UniversalMessage(role=UniversalRole.USER, content="Hello")],
+            model_config=ModelConfig(model="openai/gpt-4o"),
+        )
+        result = adapter.to_provider_format(request)
+
+        assert result["model"] == "openai/gpt-4o"
+        assert result["messages"][0]["role"] == "user"
+        assert result["messages"][0]["content"] == "Hello"
+
+    def test_to_provider_format_with_tools(self, adapter):
+        """Should include tools in OpenRouter format."""
+        tool = ToolDefinition(
+            name="get_weather",
+            description="Get weather",
+            parameters=[ToolParameter(name="city", type="string", description="City", required=True)],
+        )
+        request = UniversalRequest(
+            messages=[UniversalMessage(role=UniversalRole.USER, content="Weather?")],
+            model_config=ModelConfig(model="anthropic/claude-3.5-sonnet"),
+            tools=[tool],
+        )
+        result = adapter.to_provider_format(request)
+
+        assert "tools" in result
+        assert result["tools"][0]["function"]["name"] == "get_weather"
+
+    def test_from_provider_format(self, adapter):
+        """Should parse OpenRouter (OpenAI-compatible) response."""
+        response = {
+            "id": "gen-123",
+            "choices": [{
+                "message": {"role": "assistant", "content": "Hello!"},
+                "finish_reason": "stop",
+            }],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+            "model": "openai/gpt-4o",
+        }
+        result = adapter.from_provider_format(response)
+
+        assert result.message.content == "Hello!"
+        assert result.usage.input_tokens == 10
+        assert result.usage.output_tokens == 5
+        assert result.provider == "openrouter"
+
+    def test_from_provider_format_with_tool_calls(self, adapter):
+        """Should parse tool calls from OpenRouter response."""
+        response = {
+            "id": "gen-456",
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [{
+                        "id": "call_abc",
+                        "type": "function",
+                        "function": {"name": "get_weather", "arguments": '{"city": "NYC"}'},
+                    }]
+                },
+                "finish_reason": "tool_calls",
+            }],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 20},
+            "model": "openai/gpt-4o",
+        }
+        result = adapter.from_provider_format(response)
+
+        assert result.has_tool_calls()
+        assert result.get_tool_calls()[0].name == "get_weather"
+        assert result.get_tool_calls()[0].arguments == {"city": "NYC"}
+        assert result.finish_reason == "tool_calls"
+
+    def test_calculate_cost(self, adapter):
+        """Should calculate cost for known model."""
+        cost = adapter.calculate_cost("openai/gpt-4o", input_tokens=1000, output_tokens=500)
+        # openai/gpt-4o: $2.50/1M input, $10.00/1M output
+        expected = (1000 / 1_000_000) * 2.50 + (500 / 1_000_000) * 10.00
+        assert abs(cost - expected) < 0.0001
+
+    def test_calculate_cost_with_response_cost(self, adapter):
+        """Should use response-provided cost when available."""
+        response = {
+            "id": "gen-789",
+            "choices": [{
+                "message": {"role": "assistant", "content": "Hello!"},
+                "finish_reason": "stop",
+            }],
+            "usage": {
+                "prompt_tokens": 10,
+                "completion_tokens": 5,
+                "cost": 0.00042,
+            },
+            "model": "openai/gpt-4o",
+        }
+        result = adapter.from_provider_format(response)
+
+        # Should use the cost from the response, not calculated
+        assert result.cost == 0.00042
+
+
+# ============================================================================
 # Adapter Factory Tests
 # ============================================================================
 
@@ -571,6 +685,11 @@ class TestAdapterFactory:
         """Should return DeepSeek adapter."""
         adapter = get_adapter("deepseek")
         assert isinstance(adapter, DeepSeekAdapter)
+
+    def test_get_openrouter_adapter(self):
+        """Should return OpenRouter adapter."""
+        adapter = get_adapter("openrouter")
+        assert isinstance(adapter, OpenRouterAdapter)
 
     def test_get_unknown_adapter(self):
         """Should raise for unknown provider."""
